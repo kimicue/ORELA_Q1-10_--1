@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>ORELA Q31-50 학습 가이드</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f5f0;--bg2:#eeeae2;--card:#fff;--border:#ddd8cc;--border2:#bfb8a8;
+  --navy:#1a2744;--blue:#2855a0;--acc:#c8400a;--gold:#b8860b;
+  --green:#1a6b3c;--gbg:#e8f5ee;--red:#c8200a;--rbg:#fff0ee;
+  --abg:#fff8e6;--text:#1a1a1a;--t2:#555;--t3:#888;
+  --mono:'JetBrains Mono',monospace;--serif:'Playfair Display',serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.75}
+.hdr{background:var(--navy);padding:clamp(18px,4vw,32px) clamp(16px,4vw,36px);position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,0.03)}
+.hdr-tag{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:5px}
+.hdr-title{font-family:var(--serif);font-size:clamp(20px,5vw,30px);color:#fff;margin-bottom:4px}
+.hdr-title em{color:#f0c060;font-style:normal}
+.hdr-sub{font-size:12px;color:rgba(255,255,255,.5)}
+.hdr-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.chip{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:3px 11px;font-size:11px;color:rgba(255,255,255,.72)}
+.nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:9px clamp(12px,3vw,28px);display:flex;flex-wrap:wrap;gap:5px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.nav a{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:5px 10px;font-size:12px;font-weight:700;color:var(--navy);text-decoration:none;transition:all .15s;font-family:var(--mono);min-height:36px;display:flex;align-items:center}
+.nav a:hover,.nav a:active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.main{max-width:820px;margin:0 auto;padding:clamp(14px,3vw,32px) clamp(10px,3vw,20px) 70px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:clamp(18px,4vw,36px);overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.07);opacity:0;transform:translateY(18px);transition:opacity .4s,transform .4s}
+.card.vis{opacity:1;transform:none}
+.ch{background:linear-gradient(135deg,var(--navy),#2a3a60);padding:clamp(12px,3vw,18px) clamp(12px,3vw,22px);display:flex;align-items:flex-start;gap:12px}
+.cnum{background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.22);border-radius:9px;min-width:42px;height:42px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:18px;font-weight:700;color:#fff;flex-shrink:0}
+.ct{flex:1;min-width:0}
+.ctopic{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:3px}
+.cq{font-size:clamp(12px,2.8vw,13.5px);color:#fff;line-height:1.6}
+.choices{margin-top:9px;display:flex;flex-direction:column;gap:4px}
+.co{font-size:11.5px;padding:4px 10px;border-radius:7px;font-family:var(--mono)}
+.co.ok{background:rgba(52,211,153,.2);color:#7fffc0;border:1px solid rgba(52,211,153,.32);font-weight:700}
+.co.no{background:rgba(255,255,255,.06);color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.1)}
+.ab{width:100%;background:none;border:none;border-bottom:1px solid var(--border);padding:clamp(11px,2.5vw,15px) clamp(12px,3vw,22px);display:flex;align-items:center;justify-content:space-between;cursor:pointer;text-align:left;gap:10px;transition:background .15s}
+.ab:hover{background:rgba(40,85,160,.04)}
+.ab-l{display:flex;align-items:center;gap:9px}
+.ab-ic{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.ic-f{background:#e8f0ff}.ic-t{background:#fff8e0}.ic-s{background:#e8f8ee}.ic-p{background:#fef0e8}
+.ab-title{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--t2)}
+.arr{font-size:11px;color:var(--t3);transition:transform .22s;flex-shrink:0}
+.ab.open .arr{transform:rotate(180deg)}
+.body{display:none;padding:clamp(12px,3vw,18px) clamp(12px,3vw,22px);border-bottom:1px solid var(--border)}
+.body.open{display:block}
+.body:last-child{border-bottom:none}
+.fbox{background:#f0f4ff;border:1px solid #b8ccee;border-left:3px solid var(--blue);border-radius:9px;padding:clamp(9px,2vw,13px) clamp(11px,2vw,15px);font-family:var(--mono);font-size:clamp(10.5px,2.4vw,12.5px);color:var(--navy);line-height:1.95;white-space:pre-wrap;overflow-x:auto;margin-bottom:8px}
+.tbox{background:var(--abg);border:1px solid #ddbc58;border-left:3px solid var(--gold);border-radius:9px;padding:clamp(9px,2vw,13px) clamp(11px,2vw,15px);font-size:clamp(11.5px,2.6vw,13px);line-height:1.85;margin-bottom:8px}
+.step{display:flex;gap:11px;margin-bottom:12px;align-items:flex-start}
+.sn{width:25px;height:25px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px}
+.sc{flex:1;font-size:clamp(11.5px,2.6vw,13px);min-width:0}
+.sm{font-family:var(--mono);font-size:clamp(10px,2.3vw,11.5px);color:var(--blue);background:#f0f4ff;padding:6px 11px;border-radius:6px;margin-top:4px;display:block;overflow-x:auto;white-space:pre}
+.apill{display:inline-block;background:var(--green);color:#fff;border-radius:20px;padding:4px 16px;font-size:13px;font-weight:700;margin-top:8px}
+.pi{background:var(--rbg);border:1px solid #f0b8a8;border-radius:11px;padding:clamp(11px,3vw,15px);margin-bottom:10px}
+.pl{font-size:9.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--acc);margin-bottom:5px}
+.pq{font-size:clamp(11.5px,2.6vw,13px);color:var(--text);margin-bottom:10px;line-height:1.8}
+.prow{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch;margin-bottom:6px}
+.pin{flex:1;min-width:120px;border:2px solid var(--border2);border-radius:8px;padding:9px 13px;font-size:14px;font-family:'Noto Sans KR',sans-serif;background:#fff;color:var(--text);transition:border-color .15s;outline:none;min-height:42px}
+.pin:focus{border-color:var(--blue)}
+.pin.ok{border-color:var(--green);background:var(--gbg)}
+.pin.ng{border-color:var(--red);background:var(--rbg)}
+.pbtn{background:var(--navy);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;transition:all .15s;white-space:nowrap;min-height:42px}
+.pbtn:hover{background:var(--blue)}
+.pbtn:active{transform:scale(.97)}
+.pfb{display:none;margin-top:9px;border-radius:9px;padding:11px 13px;font-size:clamp(11.5px,2.6vw,12.5px);line-height:1.8}
+.pfb.show{display:block}
+.pfb.ok{background:var(--gbg);border:1px solid #9ed4b0;color:var(--green)}
+.pfb.ng{background:var(--rbg);border:1px solid #f0a898;color:var(--red)}
+.pfb-h{font-weight:700;font-size:13.5px;margin-bottom:5px}
+.hbtn{background:none;border:1px solid var(--border2);border-radius:6px;padding:4px 11px;font-size:11px;color:var(--t2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;margin-top:5px}
+.hbtn:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+.hbox{display:none;margin-top:7px;background:#faf6e8;border:1px solid #e0c050;border-radius:8px;padding:9px 12px;font-size:11.5px;color:#7a5500}
+.sec-divider{background:var(--bg2);border-top:2px solid var(--border);padding:10px 22px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3)}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-tag">ORELA Middle Grades Mathematics</div>
+  <div class="hdr-title">문제 <em>31 – 50</em> 학습 가이드</div>
+  <div class="hdr-sub">Algebra & Functions — 원문 · 공식 · 풀이 · 팁 · 인터랙티브 응용문제</div>
+  <div class="hdr-chips">
+    <span class="chip">📐 Algebra & Functions</span>
+    <span class="chip">✅ Q31~50</span>
+    <span class="chip">📱 모바일 최적화</span>
+    <span class="chip">✏️ 직접 풀기</span>
+  </div>
+</header>
+
+<nav class="nav">
+  <a href="#q31">31</a><a href="#q32">32</a><a href="#q33">33</a><a href="#q34">34</a><a href="#q35">35</a>
+  <a href="#q36">36</a><a href="#q37">37</a><a href="#q38">38</a><a href="#q39">39</a><a href="#q40">40</a>
+  <a href="#q41">41</a><a href="#q42">42</a><a href="#q43">43</a><a href="#q44">44</a><a href="#q45">45</a>
+  <a href="#q46">46</a><a href="#q47">47</a><a href="#q48">48</a><a href="#q49">49</a><a href="#q50">50</a>
+</nav>
+
+<div class="main">
+
+<!-- ══ Q31 ══ -->
+<div class="card" id="q31">
+  <div class="ch"><div class="cnum">31</div><div class="ct">
+    <div class="ctopic">Algebra · Polynomial Factoring</div>
+    <div class="cq">The expression 2x² − 4x − 30 is equal to the product of (x − 5) and which other factor?</div>
+    <div class="choices">
+      <span class="co no">a. (2x − 10)</span><span class="co no">b. (2x + 25)</span>
+      <span class="co no">c. (2x + 7)</span><span class="co ok">✓ d. (2x + 6)</span>
+    </div>
+  </div></div>
+  <button class="ab open" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-f">📐</div><div class="ab-title">적용 공식</div></div><span class="arr">▼</span></button>
+  <div class="body open"><div class="fbox">다항식 나눗셈 / 인수분해:
+2x² - 4x - 30 = (x-5) × ?
+
+방법 1: 직접 나누기
+(2x² - 4x - 30) ÷ (x-5) = 2x + 6
+
+방법 2: 공통인수 먼저
+2x² - 4x - 30 = 2(x² - 2x - 15)
+             = 2(x-5)(x+3)
+             = (x-5)(2x+6) ✓</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-t">💡</div><div class="ab-title">팁과 요령</div></div><span class="arr">▼</span></button>
+  <div class="body"><div class="tbox">가장 빠른 방법: <strong>검증으로 역산</strong><br>
+(x-5)(2x+6) = 2x²+6x-10x-30 = 2x²-4x-30 ✓<br><br>
+또는 공통인수 2 먼저 묶기:<br>
+2(x²-2x-15) → 두 수의 곱=-15, 합=-2 → (-5)(+3)<br>
+→ 2(x-5)(x+3) = (x-5)(2x+6)</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-s">✏️</div><div class="ab-title">풀이 과정</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="step"><div class="sn">1</div><div class="sc">공통인수 묶기<span class="sm">2x²-4x-30 = 2(x²-2x-15)</span></div></div>
+    <div class="step"><div class="sn">2</div><div class="sc">x²-2x-15 인수분해: 곱=-15, 합=-2 → -5, +3<span class="sm">2(x-5)(x+3)</span></div></div>
+    <div class="step"><div class="sn">3</div><div class="sc">= (x-5)(2x+6) → 다른 인수는 (2x+6)</div></div>
+    <div class="apill">정답: d. (2x+6)</div>
+  </div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-p">🔥</div><div class="ab-title">응용 문제 — 직접 풀기</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="pi"><div class="pl">응용 1</div>
+      <div class="pq">Factor: 3x² − 3x − 36<br>공통인수를 묶으면 3(x² − x − 12). 이걸 완전히 인수분해하면?<br>(예: 3(x+3)(x-4) 형식)</div>
+      <div class="prow"><input class="pin" type="text" placeholder="3(x+?)(x-?)"><button class="pbtn" onclick="chk(this,'3(x+3)(x-4)',['3(x+3)(x-4)','3(x-4)(x+3)'],'<strong>정답: 3(x+3)(x-4)</strong><br>x²-x-12: 곱=-12, 합=-1 → +3, -4<br>검증: (x+3)(x-4)=x²-x-12 ✓')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">곱이 -12이고 합이 -1인 두 수를 찾으세요</div>
+    </div>
+    <div class="pi"><div class="pl">응용 2</div>
+      <div class="pq">x² + 5x + 6을 인수분해하면?<br>(예: (x+2)(x+3) 형식)</div>
+      <div class="prow"><input class="pin" type="text" placeholder="(x+?)(x+?)"><button class="pbtn" onclick="chk(this,'(x+2)(x+3)',['(x+2)(x+3)','(x+3)(x+2)'],'<strong>정답: (x+2)(x+3)</strong><br>곱=6, 합=5 → 2, 3<br>검증: (x+2)(x+3)=x²+5x+6 ✓')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">곱이 6이고 합이 5인 두 수는?</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Q32 ══ -->
+<div class="card" id="q32">
+  <div class="ch"><div class="cnum">32</div><div class="ct">
+    <div class="ctopic">Algebra · Constant of Proportionality</div>
+    <div class="cq">What is the constant of proportionality from the table? (x: 2,5,7,10,11 / y: -8,-20,-28,-40,-44)</div>
+    <div class="choices">
+      <span class="co no">a. -12</span><span class="co no">b. -8</span>
+      <span class="co no">c. -6</span><span class="co ok">✓ d. -4</span>
+    </div>
+  </div></div>
+  <button class="ab open" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-f">📐</div><div class="ab-title">적용 공식</div></div><span class="arr">▼</span></button>
+  <div class="body open"><div class="fbox">비례 상수 (Constant of Proportionality) k:
+y = kx  →  k = y ÷ x
+
+어느 점에서든 동일해야 함:
+x=2,  y=-8  → k = -8÷2 = -4
+x=5,  y=-20 → k = -20÷5 = -4
+x=7,  y=-28 → k = -28÷7 = -4 ✓</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-t">💡</div><div class="ab-title">팁과 요령</div></div><span class="arr">▼</span></button>
+  <div class="body"><div class="tbox">빠른 풀이: 가장 간단한 값으로 계산<br>
+x=2, y=-8 → -8÷2 = <strong>-4</strong><br>
+나머지 점으로 검증만 하면 됨<br><br>
+⚠️ 비례가 아닌 경우: y/x 값이 점마다 다르면 비례 관계 아님</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-s">✏️</div><div class="ab-title">풀이 과정</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="step"><div class="sn">1</div><div class="sc">k = y/x 계산<span class="sm">-8÷2=-4, -20÷5=-4, -28÷7=-4 모두 동일</span></div></div>
+    <div class="apill">정답: d. -4</div>
+  </div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-p">🔥</div><div class="ab-title">응용 문제 — 직접 풀기</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="pi"><div class="pl">응용 1</div>
+      <div class="pq">A table shows: x=3, y=15 / x=5, y=25 / x=8, y=40<br>What is the constant of proportionality?<br>숫자로 입력하세요:</div>
+      <div class="prow"><input class="pin" type="text" placeholder="예: 5"><button class="pbtn" onclick="chk(this,'5',['5'],'<strong>정답: 5</strong><br>15÷3=5, 25÷5=5, 40÷8=5 → k=5<br>y=5x')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">k = y ÷ x. 첫 번째 점: 15÷3=?</div>
+    </div>
+    <div class="pi"><div class="pl">응용 2</div>
+      <div class="pq">If k = -3 and x = 7, what is y?<br>숫자로 입력하세요:</div>
+      <div class="prow"><input class="pin" type="text" placeholder="예: -21"><button class="pbtn" onclick="chk(this,'-21',['-21'],'<strong>정답: -21</strong><br>y=kx = -3×7 = -21')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">y = k × x = -3 × 7</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Q33 ══ -->
+<div class="card" id="q33">
+  <div class="ch"><div class="cnum">33</div><div class="ct">
+    <div class="ctopic">Algebra · Inverse Proportional Relationship</div>
+    <div class="cq">Which of the following represents an inversely proportional relationship?</div>
+    <div class="choices">
+      <span class="co no">a. y = 3x</span><span class="co no">b. y = (1/3)x</span>
+      <span class="co ok">✓ c. y = 3/x</span><span class="co no">d. y = 3x²</span>
+    </div>
+  </div></div>
+  <button class="ab open" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-f">📐</div><div class="ab-title">적용 공식</div></div><span class="arr">▼</span></button>
+  <div class="body open"><div class="fbox">비례 vs 반비례:
+비례 (Direct):   y = kx    → x 커지면 y도 커짐
+반비례 (Inverse): y = k/x   → x 커지면 y는 작아짐
+
+반비례 특징:
+xy = k (일정)
+그래프: 쌍곡선(hyperbola) 모양</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-t">💡</div><div class="ab-title">팁과 요령</div></div><span class="arr">▼</span></button>
+  <div class="body"><div class="tbox">암기법: "inversely proportional" = y는 x의 역수에 비례<br>
+y ∝ 1/x → y = k/x<br><br>
+실생활 예시: 속도↑ = 시간↓ (같은 거리 이동 시)<br>
+→ 시간 = 거리/속도 → 반비례 관계</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-s">✏️</div><div class="ab-title">풀이 과정</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="step"><div class="sn">1</div><div class="sc">a: y=3x → 직접 비례 ✗</div></div>
+    <div class="step"><div class="sn">2</div><div class="sc">b: y=(1/3)x → 직접 비례 (k=1/3) ✗</div></div>
+    <div class="step"><div class="sn">3</div><div class="sc">c: y=3/x → xy=3(상수) → 반비례 ✓</div></div>
+    <div class="step"><div class="sn">4</div><div class="sc">d: y=3x² → 이차 함수, 비례도 반비례도 아님 ✗</div></div>
+    <div class="apill">정답: c. y = 3/x</div>
+  </div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-p">🔥</div><div class="ab-title">응용 문제 — 직접 풀기</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="pi"><div class="pl">응용 1</div>
+      <div class="pq">If y = 12/x, what is y when x = 4?<br>숫자로 입력하세요:</div>
+      <div class="prow"><input class="pin" type="text" placeholder="예: 3"><button class="pbtn" onclick="chk(this,'3',['3'],'<strong>정답: 3</strong><br>y = 12/4 = 3<br>xy = 4×3 = 12 = k ✓')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">y = 12 ÷ x = 12 ÷ 4 = ?</div>
+    </div>
+    <div class="pi"><div class="pl">응용 2</div>
+      <div class="pq">Which equation is inversely proportional?<br>(a) y=5x (b) y=5/x (c) y=5x+1 (d) y=5x²<br>정답 입력 (a/b/c/d):</div>
+      <div class="prow"><input class="pin" type="text" placeholder="a~d" maxlength="3"><button class="pbtn" onclick="chk(this,'b',['b'],'<strong>정답: b. y=5/x</strong><br>y=k/x 형태가 반비례<br>xy=5 (일정) → 반비례 관계')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">반비례 = y = k/x 형태</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Q34 ══ -->
+<div class="card" id="q34">
+  <div class="ch"><div class="cnum">34</div><div class="ct">
+    <div class="ctopic">Algebra · Polynomial Expansion</div>
+    <div class="cq">Which expression is equivalent to −3x(x − 2)²?</div>
+    <div class="choices">
+      <span class="co no">a. -3x³+6x²-12x</span><span class="co no">b. -3x³-12x²+12x</span>
+      <span class="co no">c. -3x²+6x</span><span class="co ok">✓ d. -3x³+12x²-12x</span>
+    </div>
+  </div></div>
+  <button class="ab open" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-f">📐</div><div class="ab-title">적용 공식</div></div><span class="arr">▼</span></button>
+  <div class="body open"><div class="fbox">완전제곱식 전개:
+(a-b)² = a² - 2ab + b²
+
+-3x(x-2)² 전개:
+Step 1: (x-2)² = x²-4x+4
+Step 2: -3x × (x²-4x+4)
+       = -3x³ + 12x² - 12x</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-t">💡</div><div class="ab-title">팁과 요령</div></div><span class="arr">▼</span></button>
+  <div class="body"><div class="tbox">2단계로 나눠서:<br>
+① (x-2)² 먼저 전개 → x²-4x+4<br>
+② -3x를 각 항에 곱하기<br>
+-3x·x² = <strong>-3x³</strong><br>
+-3x·(-4x) = <strong>+12x²</strong><br>
+-3x·4 = <strong>-12x</strong><br>
+부호 실수 주의! 음수×음수=양수</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-s">✏️</div><div class="ab-title">풀이 과정</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="step"><div class="sn">1</div><div class="sc">(x-2)² 전개<span class="sm">(x-2)² = x²-4x+4</span></div></div>
+    <div class="step"><div class="sn">2</div><div class="sc">-3x 분배<span class="sm">-3x(x²-4x+4) = -3x³+12x²-12x</span></div></div>
+    <div class="apill">정답: d. -3x³+12x²-12x</div>
+  </div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-p">🔥</div><div class="ab-title">응용 문제 — 직접 풀기</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="pi"><div class="pl">응용 1</div>
+      <div class="pq">Expand: 2x(x+3)²<br>(a) 2x³+12x²+18x (b) 2x³+6x²+9x (c) 2x²+12x+18<br>정답 입력 (a/b/c):</div>
+      <div class="prow"><input class="pin" type="text" placeholder="a, b 또는 c" maxlength="3"><button class="pbtn" onclick="chk(this,'a',['a'],'<strong>정답: a. 2x³+12x²+18x</strong><br>(x+3)²=x²+6x+9<br>2x(x²+6x+9)=2x³+12x²+18x')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">(x+3)²=x²+6x+9 먼저, 그 다음 2x를 곱하기</div>
+    </div>
+    <div class="pi"><div class="pl">응용 2</div>
+      <div class="pq">What is the coefficient of x² in -3x(x-2)²?<br>숫자로 입력하세요:</div>
+      <div class="prow"><input class="pin" type="text" placeholder="예: 12"><button class="pbtn" onclick="chk(this,'12',['12'],'<strong>정답: 12</strong><br>-3x³+12x²-12x에서 x²의 계수는 12')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">위 풀이에서 x²항의 숫자는?</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Q35 ══ -->
+<div class="card" id="q35">
+  <div class="ch"><div class="cnum">35</div><div class="ct">
+    <div class="ctopic">Algebra · Linear Inequality Graph</div>
+    <div class="cq">Which graph represents the solution to y ≥ 3x − 6?</div>
+    <div class="choices">
+      <span class="co ok">✓ a. line with slope 3, y-int -6, shaded ABOVE</span>
+      <span class="co no">b. shaded below</span><span class="co no">c. wrong slope</span><span class="co no">d. wrong direction</span>
+    </div>
+  </div></div>
+  <button class="ab open" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-f">📐</div><div class="ab-title">적용 공식</div></div><span class="arr">▼</span></button>
+  <div class="body open"><div class="fbox">일차 부등식 그래프:
+y ≥ mx + b → 경계선 위쪽 영역 (선 포함, 실선)
+y > mx + b → 경계선 위쪽 영역 (선 미포함, 점선)
+y ≤ mx + b → 경계선 아래쪽 영역
+y < mx + b → 경계선 아래쪽 영역
+
+y ≥ 3x-6: 기울기 3, y절편 -6
+x=0: y≥-6 → 원점(0,0) 확인: 0≥-6 ✓ → 원점 포함 쪽</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-t">💡</div><div class="ab-title">팁과 요령</div></div><span class="arr">▼</span></button>
+  <div class="body"><div class="tbox">그래프 문제 빠른 풀이 2단계:<br>
+① 경계선 그리기: y=3x-6 (기울기 3, y절편 -6)<br>
+② 원점(0,0) 대입으로 방향 확인<br>
+0 ≥ 3(0)-6 → 0 ≥ -6 → <strong>참!</strong> → 원점 쪽 음영<br><br>
+≥ 또는 ≤ → 경계선 포함 (실선)<br>
+> 또는 < → 경계선 미포함 (점선)</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-s">✏️</div><div class="ab-title">풀이 과정</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="step"><div class="sn">1</div><div class="sc">경계선: y=3x-6 (기울기 3, y절편 -6)</div></div>
+    <div class="step"><div class="sn">2</div><div class="sc">원점 테스트: 0≥3(0)-6 → 0≥-6 → 참 → 원점 포함 쪽 음영<span class="sm">음영: 경계선 위쪽 (원점 포함)</span></div></div>
+    <div class="step"><div class="sn">3</div><div class="sc">≥ 이므로 경계선 실선(포함)</div></div>
+    <div class="apill">정답: a</div>
+  </div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-p">🔥</div><div class="ab-title">응용 문제 — 직접 풀기</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="pi"><div class="pl">응용 1</div>
+      <div class="pq">For y ≤ 2x + 4, does the point (0,0) satisfy the inequality?<br>(a) Yes (b) No<br>정답 입력 (a 또는 b):</div>
+      <div class="prow"><input class="pin" type="text" placeholder="a 또는 b" maxlength="3"><button class="pbtn" onclick="chk(this,'a',['a'],'<strong>정답: a. Yes</strong><br>x=0, y=0 대입: 0 ≤ 2(0)+4 → 0 ≤ 4 → 참 ✓<br>원점은 y ≤ 2x+4를 만족함')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">x=0, y=0을 부등식에 대입해보세요</div>
+    </div>
+    <div class="pi"><div class="pl">응용 2</div>
+      <div class="pq">What is the y-intercept of y = 3x - 6?<br>숫자로 입력하세요:</div>
+      <div class="prow"><input class="pin" type="text" placeholder="예: -6"><button class="pbtn" onclick="chk(this,'-6',['-6'],'<strong>정답: -6</strong><br>y=mx+b에서 b=y절편<br>x=0 대입: y=3(0)-6=-6')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">y=mx+b에서 b가 y절편이에요</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Q36 ══ -->
+<div class="card" id="q36">
+  <div class="ch"><div class="cnum">36</div><div class="ct">
+    <div class="ctopic">Algebra · Function Evaluation</div>
+    <div class="cq">If f(x) = (x³ − 2x + 1) / 3x, what is f(2)?</div>
+    <div class="choices">
+      <span class="co no">a. 1/3</span><span class="co no">b. 1/2</span>
+      <span class="co ok">✓ c. 5/6</span><span class="co no">d. 5/2</span>
+    </div>
+  </div></div>
+  <button class="ab open" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-f">📐</div><div class="ab-title">적용 공식</div></div><span class="arr">▼</span></button>
+  <div class="body open"><div class="fbox">함수값 계산: f(a) → x 자리에 a 대입
+
+f(x) = (x³-2x+1) / 3x
+f(2) = (2³-2(2)+1) / 3(2)
+     = (8-4+1) / 6
+     = 5/6</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-t">💡</div><div class="ab-title">팁과 요령</div></div><span class="arr">▼</span></button>
+  <div class="body"><div class="tbox">분자 먼저, 분모 나중에 계산:<br>
+분자: 2³-2(2)+1 = 8-4+1 = 5<br>
+분모: 3×2 = 6<br>
+→ 5/6<br><br>
+계산 순서 PEMDAS 주의:<br>
+2³=8 먼저, 그 다음 -2(2)=-4, 마지막 +1</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-s">✏️</div><div class="ab-title">풀이 과정</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="step"><div class="sn">1</div><div class="sc">x=2 대입<span class="sm">분자: 2³-2(2)+1 = 8-4+1 = 5
+분모: 3(2) = 6</span></div></div>
+    <div class="step"><div class="sn">2</div><div class="sc">f(2) = 5/6</div></div>
+    <div class="apill">정답: c. 5/6</div>
+  </div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-p">🔥</div><div class="ab-title">응용 문제 — 직접 풀기</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="pi"><div class="pl">응용 1</div>
+      <div class="pq">If g(x) = 2x² - 3x + 1, what is g(3)?<br>숫자로 입력하세요:</div>
+      <div class="prow"><input class="pin" type="text" placeholder="예: 10"><button class="pbtn" onclick="chk(this,'10',['10'],'<strong>정답: 10</strong><br>g(3) = 2(3²)-3(3)+1 = 2(9)-9+1 = 18-9+1 = 10')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">x=3 대입: 2(9)-3(3)+1 = ?</div>
+    </div>
+    <div class="pi"><div class="pl">응용 2</div>
+      <div class="pq">If h(x) = (x²+1)/x, what is h(4)?<br>분수로 입력하세요 (예: 17/4):</div>
+      <div class="prow"><input class="pin" type="text" placeholder="예: 17/4"><button class="pbtn" onclick="chk(this,'17/4',['17/4'],'<strong>정답: 17/4</strong><br>h(4) = (4²+1)/4 = (16+1)/4 = 17/4')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">분자: 4²+1=17, 분모: 4</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Q37 ══ -->
+<div class="card" id="q37">
+  <div class="ch"><div class="cnum">37</div><div class="ct">
+    <div class="ctopic">Algebra · Linear Equation from Table</div>
+    <div class="cq">The table shows linear data: (-2,-11),(-1,-8),(0,-5),(1,-2),(2,1). Which graph is correct?</div>
+    <div class="choices">
+      <span class="co no">a. wrong</span><span class="co no">b. wrong</span>
+      <span class="co no">c. wrong</span><span class="co ok">✓ d. slope=3, y-int=-5</span>
+    </div>
+  </div></div>
+  <button class="ab open" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-f">📐</div><div class="ab-title">적용 공식</div></div><span class="arr">▼</span></button>
+  <div class="body open"><div class="fbox">기울기 (Slope):
+m = (y₂-y₁)/(x₂-x₁)
+
+표에서:
+m = (-8-(-11))/(-1-(-2)) = 3/1 = 3
+y절편: x=0일 때 y=-5 → b=-5
+
+y = 3x - 5
+
+검증: x=2 → 3(2)-5=1 ✓</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-t">💡</div><div class="ab-title">팁과 요령</div></div><span class="arr">▼</span></button>
+  <div class="body"><div class="tbox">표에서 y절편 바로 읽기:<br>
+x=0일 때의 y값 = y절편<br>
+→ (0, -5) → y절편 = -5 (바로 읽음!)<br><br>
+기울기: 연속된 점에서 y 변화량÷x 변화량<br>
+x: -2→-1→0→1→2 (각 +1)<br>
+y: -11→-8→-5→-2→1 (각 +3)<br>
+기울기 = 3/1 = 3</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-s">✏️</div><div class="ab-title">풀이 과정</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="step"><div class="sn">1</div><div class="sc">기울기: y가 3씩 증가, x가 1씩 증가 → m=3</div></div>
+    <div class="step"><div class="sn">2</div><div class="sc">y절편: x=0 → y=-5<span class="sm">y = 3x - 5</span></div></div>
+    <div class="step"><div class="sn">3</div><div class="sc">d 그래프: 기울기 3, y절편 -5 → 정답</div></div>
+    <div class="apill">정답: d</div>
+  </div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-p">🔥</div><div class="ab-title">응용 문제 — 직접 풀기</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="pi"><div class="pl">응용 1</div>
+      <div class="pq">Table: (0,2),(1,5),(2,8),(3,11). What is the linear equation?<br>(예: y=3x+2 형식)</div>
+      <div class="prow"><input class="pin" type="text" placeholder="y=3x+2"><button class="pbtn" onclick="chk(this,'y=3x+2',['y=3x+2','y = 3x + 2'],'<strong>정답: y=3x+2</strong><br>기울기: (5-2)/(1-0)=3<br>y절편: x=0 → y=2<br>y=3x+2')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">x=0일 때 y=2 → y절편=2. 기울기는?</div>
+    </div>
+    <div class="pi"><div class="pl">응용 2</div>
+      <div class="pq">For y=3x-5, what is y when x=5?<br>숫자로 입력하세요:</div>
+      <div class="prow"><input class="pin" type="text" placeholder="예: 10"><button class="pbtn" onclick="chk(this,'10',['10'],'<strong>정답: 10</strong><br>y=3(5)-5=15-5=10')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">x=5를 y=3x-5에 대입</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Q38 ══ -->
+<div class="card" id="q38">
+  <div class="ch"><div class="cnum">38</div><div class="ct">
+    <div class="ctopic">Algebra · Linear Equation Word Problem</div>
+    <div class="cq">Elijah pays a $30 park entrance fee plus $4 for every ticket purchased. Which equation represents the cost?</div>
+    <div class="choices">
+      <span class="co no">a. y=30x+4</span><span class="co no">b. y=34x</span>
+      <span class="co ok">✓ c. y=4x+30</span><span class="co no">d. y=34x+30</span>
+    </div>
+  </div></div>
+  <button class="ab open" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-f">📐</div><div class="ab-title">적용 공식</div></div><span class="arr">▼</span></button>
+  <div class="body open"><div class="fbox">선형 방정식 만들기:
+y = (단가 × 개수) + 고정비용
+
+y = mx + b
+m = 변동비 (티켓당 $4)
+b = 고정비 (입장료 $30)
+x = 티켓 수
+
+y = 4x + 30</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-t">💡</div><div class="ab-title">팁과 요령</div></div><span class="arr">▼</span></button>
+  <div class="body"><div class="tbox">키워드 찾기:<br>
+"$30 entrance fee" → <strong>고정값(b=30)</strong><br>
+"$4 for every ticket" → <strong>변동값(m=4)</strong><br>
+"every = 매번 = 기울기"<br>
+"fee/fixed = 고정 = y절편"<br><br>
+검증: 티켓 5장 → y=4(5)+30=$50 (합리적)</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-s">✏️</div><div class="ab-title">풀이 과정</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="step"><div class="sn">1</div><div class="sc">변동비: 티켓 1장당 $4 → 기울기 m=4</div></div>
+    <div class="step"><div class="sn">2</div><div class="sc">고정비: 입장료 $30 → y절편 b=30</div></div>
+    <div class="step"><div class="sn">3</div><div class="sc">y = 4x + 30</div></div>
+    <div class="apill">정답: c. y=4x+30</div>
+  </div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-p">🔥</div><div class="ab-title">응용 문제 — 직접 풀기</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="pi"><div class="pl">응용 1</div>
+      <div class="pq">A phone plan charges $25/month plus $0.10 per text. Write the equation (y=total cost, x=texts).<br>예: y=0.10x+25 형식</div>
+      <div class="prow"><input class="pin" type="text" placeholder="y=0.10x+25"><button class="pbtn" onclick="chk(this,'y=0.10x+25',['y=0.10x+25','y=0.1x+25'],'<strong>정답: y=0.10x+25</strong><br>고정: $25/월 → b=25<br>변동: $0.10/문자 → m=0.10')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">고정비=$25(b), 변동비=$0.10(m)</div>
+    </div>
+    <div class="pi"><div class="pl">응용 2</div>
+      <div class="pq">Using y=4x+30, how many tickets can Elijah buy if he has $58?<br>숫자로 입력하세요:</div>
+      <div class="prow"><input class="pin" type="text" placeholder="예: 7"><button class="pbtn" onclick="chk(this,'7',['7'],'<strong>정답: 7장</strong><br>58=4x+30 → 4x=28 → x=7')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">58=4x+30 → 4x=? → x=?</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Q39 ══ -->
+<div class="card" id="q39">
+  <div class="ch"><div class="cnum">39</div><div class="ct">
+    <div class="ctopic">Algebra · Graph of Linear Equation</div>
+    <div class="cq">Which graph represents y = −4x − 6?</div>
+    <div class="choices">
+      <span class="co no">a. wrong</span><span class="co no">b. wrong</span>
+      <span class="co ok">✓ c. slope=-4, y-int=-6</span><span class="co no">d. wrong</span>
+    </div>
+  </div></div>
+  <button class="ab open" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-f">📐</div><div class="ab-title">적용 공식</div></div><span class="arr">▼</span></button>
+  <div class="body open"><div class="fbox">y = mx + b 그래프 읽기:
+m = 기울기 (slope)
+b = y절편 (y-intercept)
+
+y = -4x - 6
+m = -4 (오른쪽으로 갈수록 급격히 하강)
+b = -6 (y축과 -6에서 만남)
+
+점 확인:
+x=0: y=-6  (0,-6)
+x=-1: y=4-6=-2  (-1,-2)</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-t">💡</div><div class="ab-title">팁과 요령</div></div><span class="arr">▼</span></button>
+  <div class="body"><div class="tbox">그래프 선택 2단계 전략:<br>
+① y절편 확인: y축과 -6에서 교차하는 그래프<br>
+② 기울기 방향: m=-4 < 0 → <strong>오른쪽으로 내려가는</strong> 직선<br><br>
+기울기 크기: |m|=4 → 가파름(steep)<br>
+두 조건 모두 맞는 그래프 = c</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-s">✏️</div><div class="ab-title">풀이 과정</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="step"><div class="sn">1</div><div class="sc">m=-4: 음수 → 우하향 직선</div></div>
+    <div class="step"><div class="sn">2</div><div class="sc">b=-6: y절편 (0,-6)</div></div>
+    <div class="step"><div class="sn">3</div><div class="sc">점 검증: f(-2)=-4(-2)-6=8-6=2 → (-2,2) 확인</div></div>
+    <div class="apill">정답: c</div>
+  </div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-p">🔥</div><div class="ab-title">응용 문제 — 직접 풀기</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="pi"><div class="pl">응용 1</div>
+      <div class="pq">What is the slope of y = -4x - 6?<br>숫자로 입력하세요:</div>
+      <div class="prow"><input class="pin" type="text" placeholder="예: -4"><button class="pbtn" onclick="chk(this,'-4',['-4'],'<strong>정답: -4</strong><br>y=mx+b에서 m=기울기=-4')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">y=mx+b에서 x앞의 숫자가 기울기</div>
+    </div>
+    <div class="pi"><div class="pl">응용 2</div>
+      <div class="pq">Does the line y=-4x-6 go upward or downward from left to right?<br>(a) Upward (b) Downward<br>정답 입력 (a 또는 b):</div>
+      <div class="prow"><input class="pin" type="text" placeholder="a 또는 b" maxlength="3"><button class="pbtn" onclick="chk(this,'b',['b'],'<strong>정답: b. Downward</strong><br>기울기 m=-4 < 0 → 음의 기울기 → 우하향(오른쪽으로 내려감)')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">기울기가 음수이면 오른쪽으로 내려가요</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Q40 ══ -->
+<div class="card" id="q40">
+  <div class="ch"><div class="cnum">40</div><div class="ct">
+    <div class="ctopic">Algebra · System of Linear Equations</div>
+    <div class="cq">What is the solution to: 4x − 2y = −38 and 2x + 3y = 17?</div>
+    <div class="choices">
+      <span class="co ok">✓ a. (-5, 9)</span><span class="co no">b. (-2,11)</span>
+      <span class="co no">c. (-3,7)</span><span class="co no">d. (-4,11)</span>
+    </div>
+  </div></div>
+  <button class="ab open" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-f">📐</div><div class="ab-title">적용 공식</div></div><span class="arr">▼</span></button>
+  <div class="body open"><div class="fbox">연립방정식 풀기 (소거법):
+4x-2y=-38  ... ①  → 2x-y=-19  ... ①'
+2x+3y=17   ... ②
+
+①'에서: 2x = y-19 → x = (y-19)/2
+
+②에 대입: (y-19)+3y=17
+         4y=36 → y=9
+
+y=9를 ①'에: 2x=9-19=-10 → x=-5
+
+답: (-5, 9)</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-t">💡</div><div class="ab-title">팁과 요령</div></div><span class="arr">▼</span></button>
+  <div class="body"><div class="tbox">연립방정식 빠른 검증법:<br>
+구한 답 (-5, 9)를 두 식에 모두 대입!<br>
+①: 4(-5)-2(9)=-20-18=-38 ✓<br>
+②: 2(-5)+3(9)=-10+27=17 ✓<br><br>
+시험에서: 선택지를 대입해서 두 식 모두 성립하는 것 찾기가 가장 빠름!</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-s">✏️</div><div class="ab-title">풀이 과정</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="step"><div class="sn">1</div><div class="sc">①을 단순화: 4x-2y=-38 → 2x-y=-19<span class="sm">2x = y-19</span></div></div>
+    <div class="step"><div class="sn">2</div><div class="sc">②에 대입<span class="sm">(y-19)+3y=17 → 4y=36 → y=9</span></div></div>
+    <div class="step"><div class="sn">3</div><div class="sc">x 계산<span class="sm">2x=9-19=-10 → x=-5</span></div></div>
+    <div class="step"><div class="sn">4</div><div class="sc">검증: 4(-5)-2(9)=-38 ✓, 2(-5)+3(9)=17 ✓</div></div>
+    <div class="apill">정답: a. (-5, 9)</div>
+  </div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-p">🔥</div><div class="ab-title">응용 문제 — 직접 풀기</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="pi"><div class="pl">응용 1</div>
+      <div class="pq">Solve: x+y=10, x-y=4. What is x?<br>숫자로 입력하세요:</div>
+      <div class="prow"><input class="pin" type="text" placeholder="예: 7"><button class="pbtn" onclick="chk(this,'7',['7'],'<strong>정답: x=7</strong><br>두 식 더하기: 2x=14 → x=7<br>y=10-7=3<br>검증: 7+3=10✓, 7-3=4✓')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">두 식을 더하면 y가 사라져요: (x+y)+(x-y)=2x</div>
+    </div>
+    <div class="pi"><div class="pl">응용 2</div>
+      <div class="pq">Is (-5, 9) a solution to 2x+3y=17?<br>(a) Yes (b) No<br>정답 입력 (a 또는 b):</div>
+      <div class="prow"><input class="pin" type="text" placeholder="a 또는 b" maxlength="3"><button class="pbtn" onclick="chk(this,'a',['a'],'<strong>정답: a. Yes</strong><br>2(-5)+3(9)=-10+27=17 ✓')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">x=-5, y=9 대입: 2(-5)+3(9)=?</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Q41 ══ -->
+<div class="card" id="q41">
+  <div class="ch"><div class="cnum">41</div><div class="ct">
+    <div class="ctopic">Algebra · Average Rate of Change</div>
+    <div class="cq">Given graph y=2x²+2, what is the average rate of change from f(2) to f(5)?</div>
+    <div class="choices">
+      <span class="co no">a. 2</span><span class="co ok">✓ b. 14</span>
+      <span class="co no">c. 21</span><span class="co no">d. 42</span>
+    </div>
+  </div></div>
+  <button class="ab open" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-f">📐</div><div class="ab-title">적용 공식</div></div><span class="arr">▼</span></button>
+  <div class="body open"><div class="fbox">평균변화율 (Average Rate of Change):
+= [f(b) - f(a)] / (b - a)
+= Δy / Δx
+
+y = 2x²+2:
+f(2) = 2(4)+2 = 10
+f(5) = 2(25)+2 = 52
+
+평균변화율 = (52-10)/(5-2) = 42/3 = 14</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-t">💡</div><div class="ab-title">팁과 요령</div></div><span class="arr">▼</span></button>
+  <div class="body"><div class="tbox">평균변화율 = 두 점을 잇는 직선의 기울기<br>
+= (y₂-y₁)/(x₂-x₁)<br><br>
+혼동 주의: "순간변화율"(미분)과 다름!<br>
+평균변화율 = 구간 전체의 평균 기울기<br>
+순간변화율 = 특정 점에서의 기울기 (미적분)</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-s">✏️</div><div class="ab-title">풀이 과정</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="step"><div class="sn">1</div><div class="sc">f(2) 계산<span class="sm">2(2²)+2 = 2(4)+2 = 10</span></div></div>
+    <div class="step"><div class="sn">2</div><div class="sc">f(5) 계산<span class="sm">2(5²)+2 = 2(25)+2 = 52</span></div></div>
+    <div class="step"><div class="sn">3</div><div class="sc">평균변화율<span class="sm">(52-10)/(5-2) = 42/3 = 14</span></div></div>
+    <div class="apill">정답: b. 14</div>
+  </div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-p">🔥</div><div class="ab-title">응용 문제 — 직접 풀기</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="pi"><div class="pl">응용 1</div>
+      <div class="pq">For f(x) = x²+1, what is the average rate of change from x=1 to x=4?<br>숫자로 입력하세요:</div>
+      <div class="prow"><input class="pin" type="text" placeholder="예: 5"><button class="pbtn" onclick="chk(this,'5',['5'],'<strong>정답: 5</strong><br>f(1)=1+1=2, f(4)=16+1=17<br>(17-2)/(4-1)=15/3=5')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">f(1)=2, f(4)=17 → (17-2)/(4-1)=?</div>
+    </div>
+    <div class="pi"><div class="pl">응용 2</div>
+      <div class="pq">Average rate of change formula: [f(b)-f(a)] / (b-a). If f(3)=10 and f(7)=26, what is the average rate of change?<br>숫자로 입력하세요:</div>
+      <div class="prow"><input class="pin" type="text" placeholder="예: 4"><button class="pbtn" onclick="chk(this,'4',['4'],'<strong>정답: 4</strong><br>(26-10)/(7-3)=16/4=4')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">(f(b)-f(a))/(b-a) = (26-10)/(7-3)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Q42 ══ -->
+<div class="card" id="q42">
+  <div class="ch"><div class="cnum">42</div><div class="ct">
+    <div class="ctopic">Algebra · Solution from Graph (System)</div>
+    <div class="cq">What is the solution to the system of linear equations graphed? (Two lines intersecting at one point)</div>
+    <div class="choices">
+      <span class="co no">a. (2,-3)</span><span class="co no">b. (-3,-2)</span>
+      <span class="co no">c. (-2,3)</span><span class="co ok">✓ d. (-3,2)</span>
+    </div>
+  </div></div>
+  <button class="ab open" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-f">📐</div><div class="ab-title">적용 공식</div></div><span class="arr">▼</span></button>
+  <div class="body open"><div class="fbox">연립방정식의 그래프 해:
+두 직선의 교점 = 연립방정식의 해
+
+교점 읽는 법:
+x값 먼저, y값 나중 → (x, y)
+그래프에서 교점이 (-3, 2) → 해: x=-3, y=2</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-t">💡</div><div class="ab-title">팁과 요령</div></div><span class="arr">▼</span></button>
+  <div class="body"><div class="tbox">좌표 읽기 실수 방지:<br>
+항상 (x, y) 순서 → x축 값 먼저!<br>
+교점이 x=-3, y=2이면 → (-3, 2)<br><br>
+⚠️ (-2,3)과 (-3,2) 헷갈림 주의!<br>
+그래프에서 x값이 -3인지 -2인지 정확히 확인</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-s">✏️</div><div class="ab-title">풀이 과정</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="step"><div class="sn">1</div><div class="sc">그래프에서 두 직선의 교점 찾기</div></div>
+    <div class="step"><div class="sn">2</div><div class="sc">교점: x=-3, y=2 → (-3, 2)</div></div>
+    <div class="apill">정답: d. (-3, 2)</div>
+  </div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-p">🔥</div><div class="ab-title">응용 문제 — 직접 풀기</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="pi"><div class="pl">응용 1</div>
+      <div class="pq">If two lines intersect at (4, -2), what is the solution to the system?<br>(a) x=4, y=-2 (b) x=-2, y=4<br>정답 입력 (a 또는 b):</div>
+      <div class="prow"><input class="pin" type="text" placeholder="a 또는 b" maxlength="3"><button class="pbtn" onclick="chk(this,'a',['a'],'<strong>정답: a. x=4, y=-2</strong><br>교점=(4,-2) → x=4, y=-2<br>순서: (x, y) = (4, -2)')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">좌표 (x,y)에서 첫 번째가 x값, 두 번째가 y값</div>
+    </div>
+    <div class="pi"><div class="pl">응용 2</div>
+      <div class="pq">How many solutions does a system of two parallel lines have?<br>(a) 0 (b) 1 (c) 2 (d) Infinite<br>정답 입력 (a/b/c/d):</div>
+      <div class="prow"><input class="pin" type="text" placeholder="a~d" maxlength="3"><button class="pbtn" onclick="chk(this,'a',['a'],'<strong>정답: a. 0 (해 없음)</strong><br>평행선은 만나지 않음 → 교점 없음 → 해 없음<br>같은 직선이면 무수히 많은 해')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">평행선은 만나지 않아요!</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Q43 ══ -->
+<div class="card" id="q43">
+  <div class="ch"><div class="cnum">43</div><div class="ct">
+    <div class="ctopic">Algebra · System of Inequalities Graph</div>
+    <div class="cq">Which graph represents: 3x − 5y ≥ −18 and −2x + 4y ≥ 14?</div>
+    <div class="choices">
+      <span class="co ok">✓ b. correct shaded region</span>
+      <span class="co no">a,c,d. wrong regions</span>
+    </div>
+  </div></div>
+  <button class="ab open" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-f">📐</div><div class="ab-title">적용 공식</div></div><span class="arr">▼</span></button>
+  <div class="body open"><div class="fbox">연립 부등식 그래프:
+각 부등식을 y= 형태로 변환
+
+① 3x-5y ≥ -18 → -5y ≥ -3x-18 → y ≤ (3/5)x+18/5
+  → y = (3/5)x + 3.6  (경계선 아래 음영)
+
+② -2x+4y ≥ 14 → 4y ≥ 2x+14 → y ≥ (1/2)x+3.5
+  → y = (1/2)x + 3.5  (경계선 위 음영)
+
+해: 두 영역이 겹치는 부분</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-t">💡</div><div class="ab-title">팁과 요령</div></div><span class="arr">▼</span></button>
+  <div class="body"><div class="tbox">연립 부등식 그래프 접근법:<br>
+① 각 식을 y≥ 또는 y≤ 형태로 변환<br>
+② 경계선 위/아래 음영 결정<br>
+③ 원점(0,0) 테스트로 확인<br><br>
+주의: 부등호 방향 → y를 좌변으로 이동할 때<br>
+음수로 나누면 부등호 방향 반전!</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-s">✏️</div><div class="ab-title">풀이 과정</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="step"><div class="sn">1</div><div class="sc">①변환: y ≤ (3/5)x + 18/5 (아래 음영)</div></div>
+    <div class="step"><div class="sn">2</div><div class="sc">②변환: y ≥ (1/2)x + 3.5 (위 음영)</div></div>
+    <div class="step"><div class="sn">3</div><div class="sc">두 영역의 교집합 = 해 영역 → b 그래프</div></div>
+    <div class="apill">정답: b</div>
+  </div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-p">🔥</div><div class="ab-title">응용 문제 — 직접 풀기</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="pi"><div class="pl">응용 1</div>
+      <div class="pq">For y ≥ 2x - 3, is point (0,0) in the solution region?<br>(a) Yes (b) No<br>정답 입력 (a 또는 b):</div>
+      <div class="prow"><input class="pin" type="text" placeholder="a 또는 b" maxlength="3"><button class="pbtn" onclick="chk(this,'a',['a'],'<strong>정답: a. Yes</strong><br>0 ≥ 2(0)-3 → 0 ≥ -3 → 참 ✓<br>원점은 해 영역에 포함')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">x=0, y=0 대입: 0 ≥ 2(0)-3=?</div>
+    </div>
+    <div class="pi"><div class="pl">응용 2</div>
+      <div class="pq">When solving -3y ≥ 9 for y, what happens to the inequality sign?<br>(a) Stays same (b) Reverses<br>정답 입력 (a 또는 b):</div>
+      <div class="prow"><input class="pin" type="text" placeholder="a 또는 b" maxlength="3"><button class="pbtn" onclick="chk(this,'b',['b'],'<strong>정답: b. Reverses (반전)</strong><br>-3y ≥ 9 → 양변을 -3으로 나눔<br>음수로 나누면 부등호 방향 반전!<br>y ≤ -3')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">음수로 곱하거나 나눌 때 부등호 방향이 바뀌어요!</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Q44 ══ -->
+<div class="card" id="q44">
+  <div class="ch"><div class="cnum">44</div><div class="ct">
+    <div class="ctopic">Algebra · Quadratic — Time to Hit Ground</div>
+    <div class="cq">f(x) = −2x² + x + 11. How many seconds before the ball reaches the ground?</div>
+    <div class="choices">
+      <span class="co no">a. 1.4</span><span class="co no">b. 1.9</span>
+      <span class="co no">c. 2.1</span><span class="co ok">✓ d. 2.6</span>
+    </div>
+  </div></div>
+  <button class="ab open" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-f">📐</div><div class="ab-title">적용 공식</div></div><span class="arr">▼</span></button>
+  <div class="body open"><div class="fbox">땅에 닿는 시간: f(x) = 0 으로 놓기
+-2x²+x+11 = 0 → 2x²-x-11 = 0
+
+근의 공식: x = [-b ± √(b²-4ac)] / 2a
+a=2, b=-1, c=-11
+
+x = [1 ± √(1+88)] / 4
+  = [1 ± √89] / 4
+  = [1 ± 9.43] / 4
+
+x = (1+9.43)/4 = 2.61 ≈ 2.6  ✓ (양수)
+x = (1-9.43)/4 = -2.1  ✗ (음수 제외)</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-t">💡</div><div class="ab-title">팁과 요령</div></div><span class="arr">▼</span></button>
+  <div class="body"><div class="tbox">"땅에 닿는다" = 높이 = 0 = f(x)=0<br>
+시간은 반드시 <strong>양수</strong>!<br>
+근이 2개 나오면 양수만 선택<br><br>
+√89 계산: √81=9, √100=10 사이 → 약 9.4<br>
+이런 어림셈으로 선택지와 비교 가능</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-s">✏️</div><div class="ab-title">풀이 과정</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="step"><div class="sn">1</div><div class="sc">f(x)=0 설정: -2x²+x+11=0 → 2x²-x-11=0</div></div>
+    <div class="step"><div class="sn">2</div><div class="sc">근의 공식 적용<span class="sm">x = [1±√(1+88)]/4 = [1±√89]/4 ≈ [1±9.43]/4</span></div></div>
+    <div class="step"><div class="sn">3</div><div class="sc">양수 근 선택<span class="sm">x = (1+9.43)/4 ≈ 2.6 ✓</span></div></div>
+    <div class="apill">정답: d. 2.6초</div>
+  </div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-p">🔥</div><div class="ab-title">응용 문제 — 직접 풀기</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="pi"><div class="pl">응용 1</div>
+      <div class="pq">A ball's height: h(t) = -t² + 4t. When does it hit the ground? (t > 0)<br>숫자로 입력하세요:</div>
+      <div class="prow"><input class="pin" type="text" placeholder="예: 4"><button class="pbtn" onclick="chk(this,'4',['4'],'<strong>정답: t=4</strong><br>-t²+4t=0 → t(-t+4)=0<br>t=0 또는 t=4 → 양수: t=4초')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">h(t)=0 → -t²+4t=0 → t 공통인수로 묶기</div>
+    </div>
+    <div class="pi"><div class="pl">응용 2</div>
+      <div class="pq">In the quadratic formula x=[-b±√(b²-4ac)]/2a, if two solutions are x=3 and x=-1, which one represents "time"?<br>(a) x=3 (b) x=-1<br>정답 입력 (a 또는 b):</div>
+      <div class="prow"><input class="pin" type="text" placeholder="a 또는 b" maxlength="3"><button class="pbtn" onclick="chk(this,'a',['a'],'<strong>정답: a. x=3</strong><br>시간은 항상 양수!<br>x=-1은 물리적으로 의미 없음 → 제외')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">시간은 음수가 될 수 없어요!</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Q45 ══ -->
+<div class="card" id="q45">
+  <div class="ch"><div class="cnum">45</div><div class="ct">
+    <div class="ctopic">Algebra · Identifying Function Type from Table</div>
+    <div class="cq">Which type of function is shown? (x: -2,-1,0,1,2 / y: 0.25, 0.5, 1, 2, 4)</div>
+    <div class="choices">
+      <span class="co no">a. Linear</span><span class="co no">b. Quadratic</span>
+      <span class="co no">c. Cubic</span><span class="co ok">✓ d. Exponential</span>
+    </div>
+  </div></div>
+  <button class="ab open" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-f">📐</div><div class="ab-title">적용 공식</div></div><span class="arr">▼</span></button>
+  <div class="body open"><div class="fbox">함수 유형 판별:
+Linear (선형):    y의 차이가 일정 (등차)
+Quadratic (이차): y의 차이의 차이가 일정
+Exponential (지수): y의 비율이 일정 (등비)
+
+표 분석:
+y: 0.25 → 0.5 → 1 → 2 → 4
+비율: ×2  ×2   ×2  ×2 (일정!)
+→ 지수 함수: y = 2^x  또는  y = (1/4)×2^x</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-t">💡</div><div class="ab-title">팁과 요령</div></div><span class="arr">▼</span></button>
+  <div class="body"><div class="tbox">판별 순서:<br>
+① y값 차이 확인: 0.25→0.5→1→2→4<br>
+   차이: 0.25, 0.5, 1, 2 → 불규칙 → 선형 ✗<br>
+② y값 비율 확인: 0.5/0.25=2, 1/0.5=2, 2/1=2<br>
+   비율 일정(×2) → <strong>지수함수</strong> ✓<br><br>
+x=0일 때 y=1 → 초기값=1, 밑(base)=2 → y=2^x</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-s">✏️</div><div class="ab-title">풀이 과정</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="step"><div class="sn">1</div><div class="sc">y값 비율: 0.5÷0.25=2, 1÷0.5=2, 2÷1=2, 4÷2=2</div></div>
+    <div class="step"><div class="sn">2</div><div class="sc">비율이 일정(2) → 지수함수<span class="sm">y = 2^x 검증: x=0→1✓, x=1→2✓, x=-1→0.5✓</span></div></div>
+    <div class="apill">정답: d. Exponential</div>
+  </div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-p">🔥</div><div class="ab-title">응용 문제 — 직접 풀기</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="pi"><div class="pl">응용 1</div>
+      <div class="pq">Table: x=0,1,2,3 / y=3,6,12,24. What type of function?<br>(a) Linear (b) Quadratic (c) Exponential<br>정답 입력 (a/b/c):</div>
+      <div class="prow"><input class="pin" type="text" placeholder="a, b 또는 c" maxlength="3"><button class="pbtn" onclick="chk(this,'c',['c'],'<strong>정답: c. Exponential</strong><br>비율: 6/3=2, 12/6=2, 24/12=2 → ×2 일정<br>y = 3×2^x')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">y값들의 비율이 일정한가요?</div>
+    </div>
+    <div class="pi"><div class="pl">응용 2</div>
+      <div class="pq">Table: x=1,2,3,4 / y=2,4,6,8. What type?<br>(a) Linear (b) Quadratic (c) Exponential<br>정답 입력 (a/b/c):</div>
+      <div class="prow"><input class="pin" type="text" placeholder="a, b 또는 c" maxlength="3"><button class="pbtn" onclick="chk(this,'a',['a'],'<strong>정답: a. Linear</strong><br>차이: 4-2=2, 6-4=2, 8-6=2 → 차이 일정(+2)<br>y=2x')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">y값들의 차이가 일정한가, 비율이 일정한가?</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Q46 ══ -->
+<div class="card" id="q46">
+  <div class="ch"><div class="cnum">46</div><div class="ct">
+    <div class="ctopic">Algebra · Linear Equation from Table (Slope)</div>
+    <div class="cq">What linear equation includes: (-3,1),(1,-11),(3,-17),(5,-23),(9,-35)?</div>
+    <div class="choices">
+      <span class="co no">a. y=-3x-11</span><span class="co no">b. y=-6x-8</span>
+      <span class="co ok">✓ c. y=-3x-8</span><span class="co no">d. y=-12x-11</span>
+    </div>
+  </div></div>
+  <button class="ab open" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-f">📐</div><div class="ab-title">적용 공식</div></div><span class="arr">▼</span></button>
+  <div class="body open"><div class="fbox">기울기 계산:
+m = (y₂-y₁)/(x₂-x₁)
+
+두 점 (-3,1)과 (1,-11) 사용:
+m = (-11-1)/(1-(-3)) = -12/4 = -3
+
+y절편: y=mx+b에 한 점 대입
+1 = -3(-3)+b → 1 = 9+b → b = -8
+
+y = -3x - 8</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-t">💡</div><div class="ab-title">팁과 요령</div></div><span class="arr">▼</span></button>
+  <div class="body"><div class="tbox">빠른 검증: 선택지를 점에 대입<br>
+c: y=-3x-8에 (-3,1) 대입:<br>
+-3(-3)-8 = 9-8 = 1 ✓<br>
+(1,-11): -3(1)-8 = -11 ✓<br><br>
+표 문제: 연속된 두 점의 y 변화를 먼저 확인<br>
+x: -3→1 (+4), y: 1→-11 (-12) → m=-12/4=-3</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-s">✏️</div><div class="ab-title">풀이 과정</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="step"><div class="sn">1</div><div class="sc">기울기<span class="sm">m=(-11-1)/(1-(-3))=-12/4=-3</span></div></div>
+    <div class="step"><div class="sn">2</div><div class="sc">b값: 점(-3,1) 대입<span class="sm">1=-3(-3)+b → b=-8</span></div></div>
+    <div class="step"><div class="sn">3</div><div class="sc">y=-3x-8. 검증: (9,-35) → -3(9)-8=-27-8=-35 ✓</div></div>
+    <div class="apill">정답: c. y=-3x-8</div>
+  </div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-p">🔥</div><div class="ab-title">응용 문제 — 직접 풀기</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="pi"><div class="pl">응용 1</div>
+      <div class="pq">Find the equation passing through (0,5) and (2,9).<br>(예: y=2x+5 형식)</div>
+      <div class="prow"><input class="pin" type="text" placeholder="y=2x+5"><button class="pbtn" onclick="chk(this,'y=2x+5',['y=2x+5','y = 2x + 5'],'<strong>정답: y=2x+5</strong><br>m=(9-5)/(2-0)=4/2=2<br>y절편: x=0→y=5 → b=5<br>y=2x+5')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">기울기=(9-5)/(2-0)=? y절편=x=0일 때 y값</div>
+    </div>
+    <div class="pi"><div class="pl">응용 2</div>
+      <div class="pq">For y=-3x-8, what is y when x=0?<br>숫자로 입력하세요:</div>
+      <div class="prow"><input class="pin" type="text" placeholder="예: -8"><button class="pbtn" onclick="chk(this,'-8',['-8'],'<strong>정답: -8</strong><br>y절편: x=0 → y=-3(0)-8=-8')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">x=0 대입하면 y절편이 나와요</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Q47 ══ -->
+<div class="card" id="q47">
+  <div class="ch"><div class="cnum">47</div><div class="ct">
+    <div class="ctopic">Algebra · Perpendicular Lines</div>
+    <div class="cq">Which equation represents a line perpendicular to the graphed line and passing through (3,2)? (Graph shows slope = -2)</div>
+    <div class="choices">
+      <span class="co no">a. y=(1/2)x+2</span><span class="co ok">✓ b. y=(1/2)x+1/2</span>
+      <span class="co no">c. y=(3/2)x+1/2</span><span class="co no">d. y=2x+2</span>
+    </div>
+  </div></div>
+  <button class="ab open" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-f">📐</div><div class="ab-title">적용 공식</div></div><span class="arr">▼</span></button>
+  <div class="body open"><div class="fbox">수직선 (Perpendicular Lines):
+두 직선의 기울기의 곱 = -1
+m₁ × m₂ = -1
+m₂ = -1/m₁ (역수에 부호 반대)
+
+그래프 기울기 m₁=-2
+수직선 기울기 m₂ = -1/(-2) = 1/2
+
+점(3,2)를 지나므로:
+2 = (1/2)(3) + b → 2 = 3/2 + b → b = 1/2
+y = (1/2)x + 1/2</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-t">💡</div><div class="ab-title">팁과 요령</div></div><span class="arr">▼</span></button>
+  <div class="body"><div class="tbox">수직 기울기 구하는 법:<br>
+"뒤집고 부호 바꾸기"<br>
+m=-2 → 뒤집으면 -1/2 → 부호바꿔 <strong>+1/2</strong><br><br>
+평행 vs 수직:<br>
+평행(Parallel): 기울기 <strong>같음</strong><br>
+수직(Perpendicular): 기울기의 곱 = <strong>-1</strong></div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-s">✏️</div><div class="ab-title">풀이 과정</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="step"><div class="sn">1</div><div class="sc">수직 기울기: m₂=-1/(-2)=1/2</div></div>
+    <div class="step"><div class="sn">2</div><div class="sc">점(3,2) 대입<span class="sm">2=(1/2)(3)+b → b=2-3/2=1/2</span></div></div>
+    <div class="step"><div class="sn">3</div><div class="sc">y=(1/2)x+1/2</div></div>
+    <div class="apill">정답: b. y=(1/2)x+1/2</div>
+  </div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-p">🔥</div><div class="ab-title">응용 문제 — 직접 풀기</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="pi"><div class="pl">응용 1</div>
+      <div class="pq">What is the slope of a line perpendicular to y=3x+5?<br>분수로 입력하세요 (예: -1/3):</div>
+      <div class="prow"><input class="pin" type="text" placeholder="예: -1/3"><button class="pbtn" onclick="chk(this,'-1/3',['-1/3'],'<strong>정답: -1/3</strong><br>원래 기울기 m=3<br>수직 기울기 = -1/3 (역수에 부호 반대)<br>3×(-1/3)=-1 ✓')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">m=3이면 수직 기울기는 -1/3 (뒤집고 부호 반대)</div>
+    </div>
+    <div class="pi"><div class="pl">응용 2</div>
+      <div class="pq">Are y=2x+1 and y=-(1/2)x+4 perpendicular?<br>(a) Yes (b) No<br>정답 입력 (a 또는 b):</div>
+      <div class="prow"><input class="pin" type="text" placeholder="a 또는 b" maxlength="3"><button class="pbtn" onclick="chk(this,'a',['a'],'<strong>정답: a. Yes</strong><br>m₁=2, m₂=-1/2<br>m₁×m₂ = 2×(-1/2) = -1 ✓ 수직!')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">두 기울기의 곱이 -1이면 수직이에요</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Q48 ══ -->
+<div class="card" id="q48">
+  <div class="ch"><div class="cnum">48</div><div class="ct">
+    <div class="ctopic">Algebra · Parallel Lines</div>
+    <div class="cq">Which equation represents a line parallel to the graphed line and passing through (−1, 4)? (Graph shows slope = 3)</div>
+    <div class="choices">
+      <span class="co no">a. y=2x-2</span><span class="co ok">✓ b. y=3x+7</span>
+      <span class="co no">c. y=3x-4</span><span class="co no">d. y=2x+6</span>
+    </div>
+  </div></div>
+  <button class="ab open" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-f">📐</div><div class="ab-title">적용 공식</div></div><span class="arr">▼</span></button>
+  <div class="body open"><div class="fbox">평행선 (Parallel Lines):
+기울기가 같고 y절편이 다름
+m₁ = m₂ (기울기 동일)
+
+그래프 기울기 m=3
+평행선도 m=3
+
+점(-1,4) 대입:
+4 = 3(-1) + b → 4 = -3+b → b = 7
+y = 3x + 7</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-t">💡</div><div class="ab-title">팁과 요령</div></div><span class="arr">▼</span></button>
+  <div class="body"><div class="tbox">평행선 = 기울기 복사 + y절편만 바꾸기<br>
+① 기울기 그대로: m=3<br>
+② y절편 구하기: 주어진 점 대입<br>
+(-1,4): 4=3(-1)+b → b=7<br><br>
+⚠️ c: y=3x-4도 기울기는 3이지만<br>(-1,4) 대입: 3(-1)-4=-7 ≠ 4 → 틀림</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-s">✏️</div><div class="ab-title">풀이 과정</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="step"><div class="sn">1</div><div class="sc">평행 → 같은 기울기: m=3</div></div>
+    <div class="step"><div class="sn">2</div><div class="sc">점(-1,4) 대입<span class="sm">4=3(-1)+b → b=7</span></div></div>
+    <div class="step"><div class="sn">3</div><div class="sc">y=3x+7. 검증: (-1,4) → 3(-1)+7=4 ✓</div></div>
+    <div class="apill">정답: b. y=3x+7</div>
+  </div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-p">🔥</div><div class="ab-title">응용 문제 — 직접 풀기</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="pi"><div class="pl">응용 1</div>
+      <div class="pq">Write the equation of a line parallel to y=2x-3 passing through (0,5).<br>(예: y=2x+5 형식)</div>
+      <div class="prow"><input class="pin" type="text" placeholder="y=2x+5"><button class="pbtn" onclick="chk(this,'y=2x+5',['y=2x+5','y = 2x + 5'],'<strong>정답: y=2x+5</strong><br>평행 → m=2 그대로<br>점(0,5): b=5<br>y=2x+5')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">기울기는 그대로 2, y절편만 새로 구하기</div>
+    </div>
+    <div class="pi"><div class="pl">응용 2</div>
+      <div class="pq">Are y=4x+1 and y=4x-9 parallel?<br>(a) Yes (b) No<br>정답 입력 (a 또는 b):</div>
+      <div class="prow"><input class="pin" type="text" placeholder="a 또는 b" maxlength="3"><button class="pbtn" onclick="chk(this,'a',['a'],'<strong>정답: a. Yes</strong><br>m₁=4, m₂=4 → 기울기 같음 → 평행<br>y절편 다름(1≠-9) → 같은 직선 아님')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">두 직선의 기울기가 같으면 평행이에요</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Q49 ══ -->
+<div class="card" id="q49">
+  <div class="ch"><div class="cnum">49</div><div class="ct">
+    <div class="ctopic">Algebra · Linear vs Proportional (Graph)</div>
+    <div class="cq">Hannah's gym membership graph shows cumulative cost vs months, passing through origin with constant slope. Which statement is correct?</div>
+    <div class="choices">
+      <span class="co no">a. Linear but not proportional</span>
+      <span class="co ok">✓ b. Linear and proportional</span>
+      <span class="co no">c. Proportional but not linear</span>
+      <span class="co no">d. Inverse proportional</span>
+    </div>
+  </div></div>
+  <button class="ab open" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-f">📐</div><div class="ab-title">적용 공식</div></div><span class="arr">▼</span></button>
+  <div class="body open"><div class="fbox">선형(Linear) vs 비례(Proportional):
+Linear:       y = mx + b (직선 그래프)
+Proportional: y = mx    (원점 통과 직선)
+
+비례는 선형의 특별한 경우!
+
+그래프가 직선 + 원점(0,0) 통과
+→ Linear ✓  AND  Proportional ✓</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-t">💡</div><div class="ab-title">팁과 요령</div></div><span class="arr">▼</span></button>
+  <div class="body"><div class="tbox">체크리스트:<br>
+① 직선인가? → Linear ✓<br>
+② 원점(0,0)을 지나는가? → Proportional ✓<br><br>
+x=0일 때 y=0 → 회원권 0개월 = $0 → 맞음<br>
+매달 일정 금액 → 기울기 일정 → 선형<br>
+두 조건 모두 → "Linear AND Proportional"</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-s">✏️</div><div class="ab-title">풀이 과정</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="step"><div class="sn">1</div><div class="sc">직선 그래프 → Linear ✓</div></div>
+    <div class="step"><div class="sn">2</div><div class="sc">원점(0,0) 통과 → Proportional ✓</div></div>
+    <div class="step"><div class="sn">3</div><div class="sc">둘 다 해당 → b 선택</div></div>
+    <div class="apill">정답: b. Linear and proportional</div>
+  </div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-p">🔥</div><div class="ab-title">응용 문제 — 직접 풀기</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="pi"><div class="pl">응용 1</div>
+      <div class="pq">y=5x: is it linear? proportional? both? neither?<br>(a) Linear only (b) Proportional only (c) Both (d) Neither<br>정답 입력 (a/b/c/d):</div>
+      <div class="prow"><input class="pin" type="text" placeholder="a~d" maxlength="3"><button class="pbtn" onclick="chk(this,'c',['c'],'<strong>정답: c. Both</strong><br>직선 → Linear ✓<br>원점 통과(x=0→y=0) → Proportional ✓<br>y=kx 형태는 항상 둘 다!')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">x=0일 때 y=?. 직선인가요?</div>
+    </div>
+    <div class="pi"><div class="pl">응용 2</div>
+      <div class="pq">y=2x+3: linear? proportional? both?<br>(a) Linear only (b) Proportional only (c) Both (d) Neither<br>정답 입력 (a/b/c/d):</div>
+      <div class="prow"><input class="pin" type="text" placeholder="a~d" maxlength="3"><button class="pbtn" onclick="chk(this,'a',['a'],'<strong>정답: a. Linear only</strong><br>직선 → Linear ✓<br>x=0 → y=3 ≠ 0 → 원점 미통과 → Proportional ✗<br>y절편이 있으면 비례 아님!')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">x=0일 때 y=3 ≠ 0 → 원점을 통과하지 않아요</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Q50 ══ -->
+<div class="card" id="q50">
+  <div class="ch"><div class="cnum">50</div><div class="ct">
+    <div class="ctopic">Algebra · Geometric Sequence (Doubling)</div>
+    <div class="cq">Amanda saves $0.02 in month 1, doubles each month. Which equation represents savings in the nth month?</div>
+    <div class="choices">
+      <span class="co ok">✓ a. aₙ = 0.02 × 2^(n-1)</span>
+      <span class="co no">b. aₙ = 0.02 + 2ⁿ</span>
+      <span class="co no">c. aₙ = 0.02 × 2ⁿ</span>
+      <span class="co no">d. aₙ = 2n - 1.98</span>
+    </div>
+  </div></div>
+  <button class="ab open" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-f">📐</div><div class="ab-title">적용 공식</div></div><span class="arr">▼</span></button>
+  <div class="body open"><div class="fbox">등비수열 일반항:
+aₙ = a₁ × r^(n-1)
+
+a₁ = 첫째항 = $0.02
+r  = 공비 = 2 (매달 2배)
+
+aₙ = 0.02 × 2^(n-1)
+
+검증:
+n=1: 0.02 × 2⁰ = 0.02 ✓
+n=2: 0.02 × 2¹ = 0.04 ✓ (2배)
+n=3: 0.02 × 2² = 0.08 ✓ (또 2배)</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-t">💡</div><div class="ab-title">팁과 요령</div></div><span class="arr">▼</span></button>
+  <div class="body"><div class="tbox">c와 a의 차이 주의!<br>
+c: 0.02 × 2ⁿ → n=1: 0.02×2=0.04 ✗ (첫째항이 0.02가 되어야 함)<br>
+a: 0.02 × 2^(n-1) → n=1: 0.02×1=0.02 ✓<br><br>
+등비수열 공식: a₁ × r^(n-1)<br>
+지수가 n이 아니라 <strong>(n-1)</strong> 인 이유:<br>
+첫째항(n=1)에서 지수가 0이어야 하므로!</div></div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-s">✏️</div><div class="ab-title">풀이 과정</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="step"><div class="sn">1</div><div class="sc">a₁=0.02, r=2 확인</div></div>
+    <div class="step"><div class="sn">2</div><div class="sc">공식 적용: aₙ = 0.02 × 2^(n-1)</div></div>
+    <div class="step"><div class="sn">3</div><div class="sc">c와 구별: n=1 대입으로 확인<span class="sm">a: 0.02×2⁰=0.02 ✓ / c: 0.02×2¹=0.04 ✗</span></div></div>
+    <div class="apill">정답: a. aₙ = 0.02 × 2^(n-1)</div>
+  </div>
+
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ic-p">🔥</div><div class="ab-title">응용 문제 — 직접 풀기</div></div><span class="arr">▼</span></button>
+  <div class="body">
+    <div class="pi"><div class="pl">응용 1</div>
+      <div class="pq">Using aₙ = 0.02 × 2^(n-1), how much does Amanda save in month 5?<br>소수로 입력하세요 (예: 0.32):</div>
+      <div class="prow"><input class="pin" type="text" placeholder="예: 0.32"><button class="pbtn" onclick="chk(this,'0.32',['0.32','$0.32'],'<strong>정답: $0.32</strong><br>a₅ = 0.02 × 2^(5-1) = 0.02 × 2⁴ = 0.02 × 16 = $0.32')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">n=5 대입: 0.02 × 2^(5-1) = 0.02 × 16 = ?</div>
+    </div>
+    <div class="pi"><div class="pl">응용 2</div>
+      <div class="pq">A bacteria doubles every hour, starting with 50. How many after 4 hours?<br>숫자로 입력하세요:</div>
+      <div class="prow"><input class="pin" type="text" placeholder="예: 800"><button class="pbtn" onclick="chk(this,'800',['800'],'<strong>정답: 800</strong><br>aₙ = 50 × 2^(n-1)<br>n=5 (시작 후 4시간 = 5번째 시점): 50×2⁴=50×16=800<br>또는: 50→100→200→400→800 (4번 두 배)')">확인</button></div>
+      <button class="hbtn" onclick="hint(this)">힌트 보기</button><div class="pfb"></div>
+      <div class="hbox">50 → ×2 → ×2 → ×2 → ×2 = ?</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+function tog(btn){
+  const body=btn.nextElementSibling;
+  btn.classList.toggle('open');
+  body.classList.toggle('open');
+}
+function chk(btn,correct,accepted,expl){
+  const row=btn.closest('.prow');
+  const inp=row.querySelector('.pin');
+  const area=btn.closest('.pi');
+  const fb=area.querySelector('.pfb');
+  const val=inp.value.trim().toLowerCase().replace(/\s+/g,'');
+  if(!val){inp.focus();return;}
+  const ok=accepted.some(a=>a.toLowerCase().replace(/\s+/g,'')==val);
+  inp.className='pin '+(ok?'ok':'ng');
+  fb.className='pfb show '+(ok?'ok':'ng');
+  fb.innerHTML=ok
+    ?`<div class="pfb-h">✅ 정답이에요!</div>${expl}`
+    :`<div class="pfb-h">❌ 다시 도전해봐요!</div>${expl}`;
+  btn.textContent=ok?'✓ 맞음':'↺ 재도전';
+  if(ok)btn.disabled=true;
+}
+function hint(btn){
+  const hb=btn.nextElementSibling.nextElementSibling;
+  const open=hb.style.display==='block';
+  hb.style.display=open?'none':'block';
+  btn.textContent=open?'힌트 보기':'힌트 숨기기';
+}
+const io=new IntersectionObserver(e=>{
+  e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis')});
+},{threshold:0.05});
+document.querySelectorAll('.card').forEach(c=>io.observe(c));
+document.querySelectorAll('.ab.open').forEach(b=>b.nextElementSibling.classList.add('open'));
+</script>
+</body>
+</html>
