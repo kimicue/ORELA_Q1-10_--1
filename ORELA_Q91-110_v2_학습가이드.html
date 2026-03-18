@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>ORELA Q91-110 학습 가이드</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f5f0;--bg2:#eeeae2;--card:#fff;--border:#ddd8cc;--border2:#bfb8a8;
+  --navy:#1a2744;--blue:#2855a0;--acc:#c8400a;--gold:#b8860b;
+  --green:#1a6b3c;--gbg:#e8f5ee;--red:#c8200a;--rbg:#fff0ee;
+  --abg:#fff8e6;--text:#1a1a1a;--t2:#555;--t3:#888;
+  --mono:'JetBrains Mono',monospace;--serif:'Playfair Display',serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+
+/* ═══════════════════════════════════════
+   일반 스크롤 페이지 (기본 overflow:auto)
+   핀치줌은 #zoomLayer만 scale 적용
+═══════════════════════════════════════ */
+body{
+  font-family:'Noto Sans KR',sans-serif;
+  background:var(--bg);color:var(--text);
+  font-size:15px;line-height:1.75;
+  /* 브라우저 기본 스크롤 허용 */
+  overflow-x:hidden;
+  overflow-y:auto;
+  touch-action:pan-y; /* 1손가락=세로 스크롤, 2손가락만 막음 */
+}
+
+/* zoomLayer: 페이지 전체를 감싸는 레이어 */
+#zoomLayer{
+  transform-origin:top center;
+  transition:transform 0.15s ease-out;
+  width:100%;
+}
+
+/* ═══ ZOOM BADGE ═══ */
+#zoomBadge{
+  position:fixed;top:56px;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,.65);color:#fff;border-radius:20px;
+  padding:5px 16px;font-size:13px;font-family:var(--mono);font-weight:700;
+  z-index:900;pointer-events:none;opacity:0;transition:opacity .3s;
+  white-space:nowrap;
+}
+#zoomBadge.show{opacity:1}
+
+/* ═══ FAB ═══ */
+.fab-wrap{position:fixed;bottom:20px;right:16px;z-index:800;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.fab-row{display:flex;flex-direction:column;align-items:center;gap:2px}
+.fab{width:50px;height:50px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 16px rgba(0,0,0,.22);transition:transform .15s;touch-action:manipulation}
+.fab:active{transform:scale(.93)}
+.fab-draw{background:#1a2744}
+.fab-calc{background:#2855a0}
+.fab-zi{background:#1a6b3c;font-size:15px;font-weight:900}
+.fab-zo{background:#b8860b;font-size:15px;font-weight:900}
+.fab-lbl{font-size:9px;color:#fff;background:rgba(0,0,0,.55);border-radius:8px;padding:2px 6px;white-space:nowrap}
+
+/* ═══════════════════════════════════════
+   BACKDROP — 어둡게만, 블러 없음
+═══════════════════════════════════════ */
+.tool-bd{
+  position:fixed;inset:0;z-index:700;
+  display:none;
+  background:rgba(0,0,0,.55); /* 어둡게만 */
+  /* backdrop-filter 제거 → 블러 없음 */
+}
+.tool-bd.open{display:block}
+
+/* ═══ SCRATCHPAD ═══ */
+.scratch-panel{position:fixed;inset:0;z-index:710;display:none;flex-direction:column;pointer-events:none}
+.scratch-panel.open{display:flex}
+.sptop{background:rgba(26,39,68,.95);padding:8px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;pointer-events:all;flex-shrink:0}
+.sptop h2{color:#fff;font-size:14px;font-weight:700}
+.stools{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.stool{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:7px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;min-height:32px;touch-action:manipulation}
+.stool.at{background:rgba(240,192,64,.5);border-color:#f0c040}
+.sp-close{background:rgba(200,64,10,.85);border:none;color:#fff;border-radius:7px;padding:5px 12px;font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-weight:700;margin-left:auto;min-height:32px;pointer-events:all;touch-action:manipulation}
+.sp-canvas{
+  flex:1;touch-action:none;cursor:crosshair;
+  background:transparent; /* 투명 → 배경(어둡게된 페이지) 보임 */
+  pointer-events:all;display:block;
+}
+.sp-colors{background:rgba(26,39,68,.92);padding:7px 14px;display:flex;gap:7px;align-items:center;flex-wrap:wrap;pointer-events:all;flex-shrink:0}
+.csw{width:26px;height:26px;border-radius:50%;border:3px solid transparent;cursor:pointer;flex-shrink:0;touch-action:manipulation}
+.csw.sel{border-color:#fff}
+.szsl{flex:1;min-width:70px;max-width:140px;accent-color:var(--navy)}
+.szlbl{font-size:11px;color:rgba(255,255,255,.8);min-width:36px}
+
+/* ═══ CALCULATOR ═══ */
+.calc-panel{position:fixed;inset:0;z-index:710;display:none;align-items:center;justify-content:center;pointer-events:none}
+.calc-panel.open{display:flex}
+.calc-inner{pointer-events:all;position:relative}
+.calc-x{position:absolute;top:-13px;right:-13px;width:30px;height:30px;border-radius:50%;background:#c8400a;border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.3);z-index:5;touch-action:manipulation}
+/* 계산기 배경: 반투명이지만 블러 없음 → 배경 글씨 보임 */
+.calculator{width:268px;background:rgba(91,122,138,.92);border-radius:15px 15px 20px 20px;padding:12px 14px 15px;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.brand-top{text-align:center;margin-bottom:5px}
+.cm{font-family:var(--mono);font-size:14px;font-weight:700;color:#fff;letter-spacing:1px}
+.cm span{font-size:9px;font-weight:400;color:#c8dde8;display:block;letter-spacing:3px}
+.cti{font-size:7px;color:#a8c8d8;letter-spacing:1px}
+.csh{background:rgba(58,80,96,.9);border-radius:7px;padding:6px;margin-bottom:6px}
+.csc{background:rgba(143,168,118,.9);border-radius:4px;padding:5px 8px;min-height:56px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;position:relative}
+.scm{font-size:7px;color:#3a5a20;text-align:right;font-family:var(--mono)}
+.sch{font-size:9px;color:#4a6a30;text-align:right;min-height:12px;font-family:var(--mono);word-break:break-all}
+.scn{font-size:18px;color:#1a3010;text-align:right;font-family:var(--mono);font-weight:700;word-break:break-all;line-height:1.2}
+.cur{display:inline-block;width:2px;height:14px;background:#1a3010;margin-left:1px;vertical-align:middle;animation:blink 1s infinite}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+.dgb{background:rgba(232,232,224,.9);border-radius:3px;padding:2px 6px;text-align:center;font-size:6px;color:#444;margin-bottom:5px;letter-spacing:2px}
+.bg{display:grid;grid-template-columns:repeat(5,1fr);gap:3px}
+.b{border:none;border-radius:4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px 1px;min-height:30px;transition:transform .07s;outline:none;user-select:none;touch-action:manipulation}
+.b:active{transform:translateY(1px)}
+.b .s{font-size:5px;color:#c8e000;line-height:1;margin-bottom:1px;font-family:var(--mono)}
+.b .p{font-size:9px;font-weight:700;line-height:1;font-family:var(--mono)}
+.bd{background:linear-gradient(180deg,#4a4a4a,#2e2e2e);color:#fff;box-shadow:0 2px 0 #111}
+.bl{background:linear-gradient(180deg,#efefef,#d5d5d5);color:#111;box-shadow:0 2px 0 #999}
+.b2{background:linear-gradient(180deg,#ddd600,#aaaa00);color:#000;box-shadow:0 2px 0 #666}
+.b2 .p{color:#000;font-size:10px}
+.bon{background:linear-gradient(180deg,#555,#333);color:#fff;box-shadow:0 2px 0 #111}
+.bent{background:linear-gradient(180deg,#ccc,#aaa);color:#222;box-shadow:0 2px 0 #888;border-radius:10px}
+.bop{background:linear-gradient(180deg,#3a3a3a,#222);color:#fff;box-shadow:0 2px 0 #000;min-height:36px}
+.bop .p{font-size:13px}
+.nr{width:44px;height:44px;border-radius:50%;background:linear-gradient(145deg,#555,#333);box-shadow:0 2px 0 #111;position:relative;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+.nr::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:linear-gradient(145deg,#444,#222)}
+.nr .a{position:absolute;font-size:6px;color:#aaa;z-index:2}
+.au{top:3px;left:50%;transform:translateX(-50%)}
+.ad{bottom:3px;left:50%;transform:translateX(-50%)}
+.al{left:3px;top:50%;transform:translateY(-50%)}
+.ar{right:3px;top:50%;transform:translateY(-50%)}
+.mvl{text-align:center;margin-top:6px;font-size:6px;color:#a0b8c8;letter-spacing:2px}
+
+/* ═══ PAGE CONTENT ═══ */
+.hdr{background:var(--navy);padding:clamp(18px,4vw,32px) clamp(16px,4vw,36px);position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.03)}
+.htag{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:5px}
+.htitle{font-family:var(--serif);font-size:clamp(20px,5vw,30px);color:#fff;margin-bottom:4px}
+.htitle em{color:#f0c060;font-style:normal}
+.hsub{font-size:12px;color:rgba(255,255,255,.5)}
+.hchips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.hchip{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:3px 11px;font-size:11px;color:rgba(255,255,255,.72)}
+.qnav{background:var(--bg2);border-bottom:1px solid var(--border);padding:9px clamp(12px,3vw,28px);display:flex;flex-wrap:wrap;gap:5px;position:sticky;top:0;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.qnav a{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:5px 10px;font-size:12px;font-weight:700;color:var(--navy);text-decoration:none;font-family:var(--mono);min-height:36px;display:flex;align-items:center;touch-action:manipulation}
+.qnav a:active{background:var(--navy);color:#fff}
+.main{max-width:820px;margin:0 auto;padding:clamp(14px,3vw,32px) clamp(10px,3vw,20px) 130px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:clamp(18px,4vw,36px);overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.07);opacity:0;transform:translateY(18px);transition:opacity .4s,transform .4s}
+.card.vis{opacity:1;transform:none}
+.ch{background:linear-gradient(135deg,var(--navy),#2a3a60);padding:clamp(12px,3vw,18px) clamp(12px,3vw,22px)}
+.cnr{display:flex;align-items:flex-start;gap:12px}
+.cnum{background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.22);border-radius:9px;min-width:42px;height:42px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:18px;font-weight:700;color:#fff;flex-shrink:0}
+.ct{flex:1;min-width:0}
+.ctopic{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:3px}
+.cq{font-size:clamp(12px,2.8vw,13.5px);color:#fff;line-height:1.6}
+.qchoices{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+.qcbtn{display:flex;align-items:flex-start;gap:12px;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 14px;cursor:pointer;text-align:left;width:100%;transition:all .18s;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:clamp(12px,2.8vw,13px);line-height:1.5;touch-action:manipulation}
+.qcbtn:active:not([disabled]){background:rgba(255,255,255,.22)}
+.qcbtn .ql{min-width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.45);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;font-family:var(--mono);flex-shrink:0;margin-top:1px;transition:all .18s}
+.qcbtn.correct{background:rgba(52,211,153,.25);border-color:#34d399}
+.qcbtn.correct .ql{background:#34d399;border-color:#34d399;color:#fff}
+.qcbtn.wrong{background:rgba(200,32,10,.25);border-color:#ff6b6b}
+.qcbtn.wrong .ql{background:#ff6b6b;border-color:#ff6b6b;color:#fff}
+.qcbtn.show-correct{background:rgba(52,211,153,.15);border-color:rgba(52,211,153,.5)}
+.qfb{margin-top:10px;padding:10px 14px;border-radius:9px;font-size:13px;display:none}
+.qfb.show{display:block}
+.qfb.ok{background:rgba(52,211,153,.18);border:1px solid rgba(52,211,153,.4);color:#a0ffd8}
+.qfb.ng{background:rgba(200,32,10,.18);border:1px solid rgba(255,107,107,.4);color:#ffaaaa}
+.pchoices{display:flex;flex-direction:column;gap:5px;margin-top:4px}
+.pcbtn{display:flex;align-items:flex-start;gap:10px;background:#fff;border:2px solid var(--border);border-radius:10px;padding:9px 12px;cursor:pointer;text-align:left;width:100%;transition:all .15s;font-family:'Noto Sans KR',sans-serif;font-size:clamp(11.5px,2.6vw,13px);line-height:1.5;color:var(--text);touch-action:manipulation}
+.pcbtn:active:not([disabled]){background:#f0efff}
+.pcbtn .pl{min-width:24px;height:24px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;font-family:var(--mono);flex-shrink:0;color:var(--t2);margin-top:1px;transition:all .15s}
+.pcbtn.correct{background:var(--gbg);border-color:#34d399}
+.pcbtn.correct .pl{background:#1a6b3c;border-color:#1a6b3c;color:#fff}
+.pcbtn.wrong{background:var(--rbg);border-color:#ff6b6b}
+.pcbtn.wrong .pl{background:#c8200a;border-color:#c8200a;color:#fff}
+.pcbtn.show-correct{background:#e8f5ee;border-color:rgba(52,211,153,.5)}
+.pfb{margin-top:8px;padding:9px 12px;border-radius:9px;font-size:clamp(11.5px,2.6vw,12.5px);display:none;line-height:1.8}
+.pfb.show{display:block}
+.pfb.ok{background:var(--gbg);border:1px solid #9ed4b0;color:var(--green)}
+.pfb.ng{background:var(--rbg);border:1px solid #f0a898;color:var(--red)}
+.pfb .pfh{font-weight:700;font-size:13px;margin-bottom:4px}
+.ab{width:100%;background:none;border:none;border-bottom:1px solid var(--border);padding:clamp(11px,2.5vw,15px) clamp(12px,3vw,22px);display:flex;align-items:center;justify-content:space-between;cursor:pointer;text-align:left;gap:10px;transition:background .15s;touch-action:manipulation}
+.ab:active{background:rgba(40,85,160,.05)}
+.ab-l{display:flex;align-items:center;gap:9px}
+.ab-ic{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.if{background:#e8f0ff}.it{background:#fff8e0}.is{background:#e8f8ee}.ip{background:#fef0e8}
+.abt{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--t2)}
+.aarr{font-size:11px;color:var(--t3);transition:transform .22s;flex-shrink:0}
+.ab.open .aarr{transform:rotate(180deg)}
+.body{display:none;padding:clamp(12px,3vw,18px) clamp(12px,3vw,22px);border-bottom:1px solid var(--border)}
+.body.open{display:block}
+.body:last-child{border-bottom:none}
+.fbox{background:#f0f4ff;border:1px solid #b8ccee;border-left:3px solid var(--blue);border-radius:9px;padding:clamp(9px,2vw,13px) clamp(11px,2vw,15px);font-family:var(--mono);font-size:clamp(10.5px,2.4vw,12.5px);color:var(--navy);line-height:1.95;white-space:pre-wrap;overflow-x:auto;margin-bottom:8px}
+.tbox{background:var(--abg);border:1px solid #ddbc58;border-left:3px solid var(--gold);border-radius:9px;padding:clamp(9px,2vw,13px) clamp(11px,2vw,15px);font-size:clamp(11.5px,2.6vw,13px);line-height:1.85;margin-bottom:8px}
+.step{display:flex;gap:11px;margin-bottom:12px;align-items:flex-start}
+.sn{width:25px;height:25px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px}
+.sc{flex:1;font-size:clamp(11.5px,2.6vw,13px);min-width:0}
+.sm{font-family:var(--mono);font-size:clamp(10px,2.3vw,11.5px);color:var(--blue);background:#f0f4ff;padding:6px 11px;border-radius:6px;margin-top:4px;display:block;overflow-x:auto;white-space:pre}
+.apill{display:inline-block;background:var(--green);color:#fff;border-radius:20px;padding:4px 16px;font-size:13px;font-weight:700;margin-top:8px}
+.pi{background:var(--rbg);border:1px solid #f0b8a8;border-radius:11px;padding:clamp(11px,3vw,15px);margin-bottom:10px}
+.pl2{font-size:9.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--acc);margin-bottom:5px}
+.pq{font-size:clamp(11.5px,2.6vw,13px);color:var(--text);margin-bottom:10px;line-height:1.8}
+</style>
+</head>
+<body>
+
+<div id="zoomBadge">🔍 100%</div>
+
+<!-- FAB -->
+<div class="fab-wrap">
+  <div class="fab-row"><span class="fab-lbl">계산기</span><button class="fab fab-calc" onclick="openCalc()">🧮</button></div>
+  <div class="fab-row"><span class="fab-lbl">낙서패드</span><button class="fab fab-draw" onclick="openScratch()">✏️</button></div>
+  <div class="fab-row"><span class="fab-lbl">확대</span><button class="fab fab-zi" onclick="btnZoom(.25)">＋</button></div>
+  <div class="fab-row"><span class="fab-lbl">축소</span><button class="fab fab-zo" onclick="btnZoom(-.25)">－</button></div>
+</div>
+
+<!-- BACKDROP (어둡게만, 블러 없음) -->
+<div class="tool-bd" id="backdrop"></div>
+
+<!-- SCRATCHPAD -->
+<div class="scratch-panel" id="scratchPanel">
+  <div class="sptop">
+    <h2>✏️ 낙서패드</h2>
+    <div class="stools">
+      <button class="stool at" id="penBtn" onclick="setTool('pen')">🖊 펜</button>
+      <button class="stool" id="eraserBtn" onclick="setTool('eraser')">🧹 지우개</button>
+      <button class="stool" onclick="clearC()">🗑 지우기</button>
+    </div>
+    <button class="sp-close" onclick="closeScratch()">✕ 닫기</button>
+  </div>
+  <canvas class="sp-canvas" id="spCanvas"></canvas>
+  <div class="sp-colors">
+    <span style="font-size:11px;color:rgba(255,255,255,.8)">색상:</span>
+    <div class="csw sel" style="background:#ffff00" data-c="#ffff00" onclick="setC(this)"></div>
+    <div class="csw" style="background:#fff" data-c="#fff" onclick="setC(this)"></div>
+    <div class="csw" style="background:#ff6b6b" data-c="#ff6b6b" onclick="setC(this)"></div>
+    <div class="csw" style="background:#64ffda" data-c="#64ffda" onclick="setC(this)"></div>
+    <div class="csw" style="background:#ffb74d" data-c="#ffb74d" onclick="setC(this)"></div>
+    <div class="csw" style="background:#ce93d8" data-c="#ce93d8" onclick="setC(this)"></div>
+    <span style="font-size:11px;color:rgba(255,255,255,.8);margin-left:8px">굵기:</span>
+    <input type="range" class="szsl" id="bsz" min="1" max="20" value="3" oninput="upSz()">
+    <span class="szlbl" id="szLbl">3px</span>
+  </div>
+</div>
+
+<!-- CALCULATOR -->
+<div class="calc-panel" id="calcPanel">
+  <div class="calc-inner">
+    <button class="calc-x" onclick="closeCalc()">✕</button>
+    <div class="calculator">
+      <div class="brand-top">
+        <div class="cm">TI-30XS<span>MultiView</span></div>
+        <div class="cti">🐾 TEXAS INSTRUMENTS</div>
+      </div>
+      <div class="csh">
+        <div class="csc">
+          <div class="scm">DEG</div>
+          <div class="sch" id="cHist"></div>
+          <div class="scn" id="cMain">0<span class="cur"></span></div>
+        </div>
+      </div>
+      <div class="dgb">DEG</div>
+      <div class="bg">
+        <button class="b b2" onclick="cp('2nd')"><div class="p">2nd</div></button>
+        <button class="b bd" onclick="cp('mode')"><div class="s">quit</div><div class="p">mode</div></button>
+        <button class="b bd" onclick="cp('del')"><div class="s">ins</div><div class="p">del</div></button>
+        <div style="grid-column:span 2;display:flex;align-items:center;justify-content:center">
+          <div class="nr"><span class="a au">▲</span><span class="a ad">▼</span><span class="a al">◀</span><span class="a ar">▶</span></div>
+        </div>
+        <button class="b bd" onclick="cp('log')"><div class="s">10⁻ˣ</div><div class="p">log</div></button>
+        <button class="b bd" onclick="cp('prb')"><div class="s">ang</div><div class="p">prb</div></button>
+        <button class="b bd" onclick="cp('data')"><div class="s">stat</div><div class="p">data</div></button>
+        <div style="grid-column:span 2"></div>
+        <button class="b bd" onclick="cp('ln')"><div class="s">eˣ</div><div class="p">ln</div></button>
+        <button class="b bd" onclick="cp('frac')"><div class="s">U/d</div><div class="p">n/d</div></button>
+        <button class="b bd" onclick="cp('sci')"><div class="s">↔</div><div class="p">×10ⁿ</div></button>
+        <button class="b bd" onclick="cp('tbl')"><div class="s">f↔d</div><div class="p">tbl</div></button>
+        <button class="b bd" onclick="cp('clr')"><div class="p">clr</div></button>
+        <button class="b bd" onclick="cp('pi')"><div class="s">hyp</div><div class="p">π</div></button>
+        <button class="b bd" onclick="cp('sin')"><div class="s">sin⁻¹</div><div class="p">sin</div></button>
+        <button class="b bd" onclick="cp('cos')"><div class="s">cos⁻¹</div><div class="p">cos</div></button>
+        <button class="b bd" onclick="cp('tan')"><div class="s">tan⁻¹</div><div class="p">tan</div></button>
+        <button class="b bop" onclick="cp('div')"><div class="p">÷</div></button>
+        <button class="b bd" onclick="cp('pow')"><div class="s">ˣ√</div><div class="p">^</div></button>
+        <button class="b bd" onclick="cp('inv')"><div class="s">%</div><div class="p">x⁻¹</div></button>
+        <button class="b bd" onclick="cp('lp')"><div class="p">(</div></button>
+        <button class="b bd" onclick="cp('rp')"><div class="p">)</div></button>
+        <button class="b bop" onclick="cp('mul')"><div class="p">×</div></button>
+        <button class="b bd" onclick="cp('sq')"><div class="s">√</div><div class="p">x²</div></button>
+        <button class="b bl" onclick="cp('7')"><div class="p">7</div></button>
+        <button class="b bl" onclick="cp('8')"><div class="p">8</div></button>
+        <button class="b bl" onclick="cp('9')"><div class="p">9</div></button>
+        <button class="b bop" onclick="cp('sub')"><div class="p">−</div></button>
+        <button class="b bd" onclick="cp('var')"><div class="s">clrV</div><div class="p" style="font-size:7px">xyz</div></button>
+        <button class="b bl" onclick="cp('4')"><div class="p">4</div></button>
+        <button class="b bl" onclick="cp('5')"><div class="p">5</div></button>
+        <button class="b bl" onclick="cp('6')"><div class="p">6</div></button>
+        <button class="b bop" onclick="cp('add')"><div class="p">+</div></button>
+        <button class="b bd" onclick="cp('sto')"><div class="s">rcl</div><div class="p">sto▶</div></button>
+        <button class="b bl" onclick="cp('1')"><div class="p">1</div></button>
+        <button class="b bl" onclick="cp('2')"><div class="p">2</div></button>
+        <button class="b bl" onclick="cp('3')"><div class="p">3</div></button>
+        <button class="b bent" onclick="cp('enter')"><div class="p">enter</div></button>
+        <button class="b bon" onclick="cp('on')"><div class="s">off</div><div class="p">on</div></button>
+        <button class="b bl" onclick="cp('0')"><div class="p">0</div></button>
+        <button class="b bl" onclick="cp('dot')"><div class="p">.</div></button>
+        <button class="b bl" onclick="cp('neg')"><div class="s">ans</div><div class="p">(−)</div></button>
+        <div></div>
+      </div>
+      <div class="mvl">MultiView Display</div>
+    </div>
+  </div>
+</div>
+
+<!-- ZOOM LAYER (wraps all content) -->
+<div id="zoomLayer">
+
+<header class="hdr">
+  <div class="htag">ORELA Middle Grades Mathematics</div>
+  <div class="htitle">문제 <em>91 – 110</em> 학습 가이드</div>
+  <div class="hsub">Geometry / Statistics · Khan 스타일 인터랙티브</div>
+  <div class="hchips">
+    <span class="hchip">📐 Q91~110</span>
+    <span class="hchip">🎯 클릭으로 답 선택</span>
+    <span class="hchip">🔍 두 손가락 핀치줌</span>
+    <span class="hchip">✏️ 투명 낙서패드</span>
+    <span class="hchip">🧮 계산기</span>
+  </div>
+</header>
+
+<nav class="qnav">
+  <a href="#q91">91</a><a href="#q92">92</a><a href="#q93">93</a><a href="#q94">94</a><a href="#q95">95</a>
+  <a href="#q96">96</a><a href="#q97">97</a><a href="#q98">98</a><a href="#q99">99</a><a href="#q100">100</a>
+  <a href="#q101">101</a><a href="#q102">102</a><a href="#q103">103</a><a href="#q104">104</a><a href="#q105">105</a>
+  <a href="#q106">106</a><a href="#q107">107</a><a href="#q108">108</a><a href="#q109">109</a><a href="#q110">110</a>
+</nav>
+
+<div class="main" id="cardsContainer"></div>
+</div><!-- /zoomLayer -->
+
+<script>
+// ══════════════════════════════════════════════
+// QUESTION DATA (Q91-110)
+// ══════════════════════════════════════════════
+const QS=[
+{id:'q91',n:91,topic:'Geometry · Hypotenuse from Shadow',
+ q:'Man is 5.8 ft tall, shadow=6.2 ft. Distance from top of head to end of shadow?',
+ choices:[
+  {l:'a',t:'7 ft',correct:false,expl:'❌ 피타고라스: c=√(5.8²+6.2²)=√72.08≈8.5'},
+  {l:'b',t:'7.5 ft',correct:false,expl:'❌ c=√(33.64+38.44)=√72.08≈8.5'},
+  {l:'c',t:'8 ft',correct:false,expl:'❌ √72.08≈8.49≈8.5 ft'},
+  {l:'d',t:'8.5 ft',correct:true,expl:'✅ 정답! c=√(5.8²+6.2²)=√72.08≈<strong>8.5 ft</strong>'},
+ ],
+ formula:`피타고라스: c = √(a²+b²)\nc = √(5.8² + 6.2²)\n  = √(33.64 + 38.44) = √72.08 ≈ 8.5 ft`,
+ tip:'키와 그림자=두 다리 → 빗변=머리끝→그림자끝 거리',
+ steps:[['c=√(a²+b²)','=√(33.64+38.44)=√72.08≈8.5 ft']],
+ pracs:[
+  {q:'Legs=6, 8. Hypotenuse?',choices:[{l:'a',t:'10',correct:true},{l:'b',t:'12'},{l:'c',t:'14'},{l:'d',t:'√50'}],expl:'<strong>a. 10</strong><br>√(36+64)=√100=10'},
+  {q:'Legs=5, 12. Hypotenuse?',choices:[{l:'a',t:'11'},{l:'b',t:'13',correct:true},{l:'c',t:'15'},{l:'d',t:'17'}],expl:'<strong>b. 13</strong><br>√(25+144)=√169=13'},
+ ]},
+{id:'q92',n:92,topic:'Geometry · Cross-Sections of Cylinder',
+ q:'A cylindrical carrot stick is sliced. Which shape is NOT possible?',
+ choices:[
+  {l:'a',t:'Circle',correct:false,expl:'❌ 수평으로 자르면 원이 나와요.'},
+  {l:'b',t:'Rectangle',correct:false,expl:'❌ 수직으로 자르면 직사각형이 나와요.'},
+  {l:'c',t:'Ellipse',correct:false,expl:'❌ 비스듬히 자르면 타원이 나와요.'},
+  {l:'d',t:'Triangle',correct:true,expl:'✅ 정답! 원기둥=꼭짓점 없음 → <strong>삼각형 불가</strong>'},
+ ],
+ formula:`원기둥 단면:\n수평→원 / 수직→직사각형 / 비스듬→타원\n삼각형: 불가능 (꼭짓점 없음)`,
+ tip:'원기둥에는 꼭짓점이 없어서 삼각형 단면 불가',
+ steps:[['가능','Circle, Rectangle, Ellipse'],['불가','Triangle ✗']],
+ pracs:[
+  {q:'A sphere is cut. Cross-section shape?',choices:[{l:'a',t:'Circle',correct:true},{l:'b',t:'Oval'},{l:'c',t:'Square'},{l:'d',t:'Triangle'}],expl:'<strong>a. Circle</strong><br>구를 어느 방향으로 잘라도 항상 원'},
+  {q:'How many rectangular faces does a cylinder have?',choices:[{l:'a',t:'0'},{l:'b',t:'1',correct:true},{l:'c',t:'2'},{l:'d',t:'3'}],expl:'<strong>b. 1</strong><br>원기둥의 옆면을 펼치면 직사각형 1개'},
+ ]},
+{id:'q93',n:93,topic:'Geometry · Inscribed Angle (Two Arcs)',
+ q:'Arc CD=48°, Arc AB=62°. What is x° (angle at chord intersection)?',
+ choices:[
+  {l:'a',t:'16°',correct:false,expl:'❌ 교차각=(호1+호2)/2=(48+62)/2=55°'},
+  {l:'b',t:'24°',correct:false,expl:'❌ (48+62)/2=110/2=55°'},
+  {l:'c',t:'48°',correct:false,expl:'❌ 교차각=(호1+호2)/2 적용'},
+  {l:'d',t:'55°',correct:true,expl:'✅ 정답! x=(48+62)/2=<strong>55°</strong>'},
+ ],
+ formula:`두 현 교차각:\nx = (arc₁ + arc₂) / 2\n= (48+62)/2 = 55°`,
+ tip:'원 안 두 현 교차 → 각도=(두 호의 합)/2',
+ steps:[['공식','x=(48+62)/2=55°']],
+ pracs:[
+  {q:'Chords intersect. Arcs=70°, 90°. Angle?',choices:[{l:'a',t:'70°'},{l:'b',t:'80°',correct:true},{l:'c',t:'90°'},{l:'d',t:'160°'}],expl:'<strong>b. 80°</strong><br>(70+90)/2=80°'},
+  {q:'Inscribed angle. Arc=100°. Angle?',choices:[{l:'a',t:'40°'},{l:'b',t:'50°',correct:true},{l:'c',t:'100°'},{l:'d',t:'200°'}],expl:'<strong>b. 50°</strong><br>내접각=100/2=50°'},
+ ]},
+{id:'q94',n:94,topic:'Geometry · Tangent-Chord Angle',
+ q:'Chord and tangent meet at A. Inner arc=68°. Find x°.',
+ choices:[
+  {l:'a',t:'68°',correct:false,expl:'❌ x=2×68=136°'},
+  {l:'b',t:'76°',correct:false,expl:'❌ x=2×68=136°'},
+  {l:'c',t:'128°',correct:false,expl:'❌ x=2×68=136°'},
+  {l:'d',t:'136°',correct:true,expl:'✅ 정답! x=2×68=<strong>136°</strong>'},
+ ],
+ formula:`탄젠트-현 각도:\n호 = 내접각 × 2\nx = 68 × 2 = 136°`,
+ tip:'탄젠트-현 각도: 호=내접각×2. 반대로 내접각=호/2',
+ steps:[['x=2×68','=136°']],
+ pracs:[
+  {q:'Tangent-chord angle=45°. Arc?',choices:[{l:'a',t:'45°'},{l:'b',t:'90°',correct:true},{l:'c',t:'135°'},{l:'d',t:'180°'}],expl:'<strong>b. 90°</strong><br>호=2×45=90°'},
+  {q:'Arc=120°. Inscribed angle?',choices:[{l:'a',t:'40°'},{l:'b',t:'60°',correct:true},{l:'c',t:'120°'},{l:'d',t:'240°'}],expl:'<strong>b. 60°</strong><br>내접각=120/2=60°'},
+ ]},
+{id:'q95',n:95,topic:'Geometry · Net of Triangular Prism',
+ q:'Which represents the net of a triangular prism?',
+ choices:[
+  {l:'a',t:'a. square pyramid net (diamond+square)',correct:false,expl:'❌ 사각뿔 전개도예요.'},
+  {l:'b',t:'b. octahedron-like net',correct:false,expl:'❌ 삼각기둥이 아닌 다른 입체.'},
+  {l:'c',t:'c. vertical strip with triangles',correct:false,expl:'❌ 전개도 형태 불일치.'},
+  {l:'d',t:'d. 2 triangles + 3 rectangles',correct:true,expl:'✅ 정답! 삼각기둥=삼각형 2+직사각형 3'},
+ ],
+ formula:`삼각기둥 전개도:\n삼각형 2개 (앞/뒤면)\n직사각형 3개 (옆면3개)\n총 5면`,
+ tip:'삼각기둥=5면(삼각형2+직사각형3)',
+ steps:[['삼각기둥','삼각형2+직사각형3'],['d 확인','✓']],
+ pracs:[
+  {q:'How many faces does a triangular prism have?',choices:[{l:'a',t:'4'},{l:'b',t:'5',correct:true},{l:'c',t:'6'},{l:'d',t:'8'}],expl:'<strong>b. 5</strong><br>삼각형2+직사각형3=5면'},
+  {q:'Cube net has how many squares?',choices:[{l:'a',t:'4'},{l:'b',t:'5'},{l:'c',t:'6',correct:true},{l:'d',t:'8'}],expl:'<strong>c. 6</strong><br>정육면체=6면'},
+ ]},
+{id:'q96',n:96,topic:"Geometry · Euler's Formula",
+ q:"E=9 edges, V=6 vertices. How many faces? (E=F+V-2)",
+ choices:[
+  {l:'a',t:'4',correct:false,expl:'❌ 9=F+6-2 → F=5'},
+  {l:'b',t:'5',correct:true,expl:"✅ 정답! 9=F+6-2 → F=<strong>5</strong>"},
+  {l:'c',t:'6',correct:false,expl:'❌ F=9-4=5'},
+  {l:'d',t:'8',correct:false,expl:'❌ E=F+V-2. F=5'},
+ ],
+ formula:`오일러 공식: E = F + V - 2\n9 = F + 6 - 2 → F = 5`,
+ tip:'E=모서리, F=면, V=꼭짓점. E=F+V-2 암기!',
+ steps:[['9=F+6-2','→ F=5']],
+ pracs:[
+  {q:'Cube: E=12, V=8. Faces?',choices:[{l:'a',t:'4'},{l:'b',t:'5'},{l:'c',t:'6',correct:true},{l:'d',t:'8'}],expl:'<strong>c. 6</strong><br>12=F+8-2 → F=6'},
+  {q:'Tetrahedron: F=4, V=4. Edges?',choices:[{l:'a',t:'4'},{l:'b',t:'6',correct:true},{l:'c',t:'8'},{l:'d',t:'12'}],expl:'<strong>b. 6</strong><br>E=4+4-2=6'},
+ ]},
+{id:'q97',n:97,topic:'Geometry · Parallel Lines Angles',
+ q:'Two parallel lines, transversal. Which statement is correct?',
+ choices:[
+  {l:'a',t:'b and g: complementary (합=90°)',correct:false,expl:'❌ b와 g는 complementary 아님.'},
+  {l:'b',t:'d and c: supplementary (합=180°)',correct:false,expl:'❌ d와 c는 인접각.'},
+  {l:'c',t:'a and e: supplementary (합=180°)',correct:true,expl:'✅ 정답! a와 e=Co-interior → 합=<strong>180°</strong>'},
+  {l:'d',t:'e and h: congruent',correct:false,expl:'❌ e와 h는 그런 관계 아님.'},
+ ],
+ formula:`동측내각(Co-interior): 합=180°\n엇각(Alternate): 합동\n동위각(Corresponding): 합동`,
+ tip:'a와 e: 같은 쪽 내각 → Co-interior → 180°',
+ steps:[['a,e 위치','같은 쪽 내각(co-interior)'],['결론','합=180°']],
+ pracs:[
+  {q:'Co-interior angles sum to:',choices:[{l:'a',t:'90°'},{l:'b',t:'120°'},{l:'c',t:'180°',correct:true},{l:'d',t:'360°'}],expl:'<strong>c. 180°</strong>'},
+  {q:'Corresponding angles are:',choices:[{l:'a',t:'supplementary'},{l:'b',t:'congruent',correct:true},{l:'c',t:'complementary'},{l:'d',t:'reflex'}],expl:'<strong>b. congruent</strong>'},
+ ]},
+{id:'q98',n:98,topic:'Geometry · Triangle Similarity (AA)',
+ q:'△ABC~△ADE? Both share ∠A, ∠ABC=∠ADE=65°. Which postulate?',
+ choices:[
+  {l:'a',t:'ASA',correct:false,expl:'❌ ASA는 합동조건. 닮음은 AA.'},
+  {l:'b',t:'AA',correct:true,expl:'✅ 정답! 두 각 같음 → <strong>AA Similarity</strong>'},
+  {l:'c',t:'SAS',correct:false,expl:'❌ 닮음 증명: AA, SAS~, SSS~'},
+  {l:'d',t:'SSS',correct:false,expl:'❌ 여기선 두 각이 같음 → AA'},
+ ],
+ formula:`닮음 조건:\nAA~: 두 각 같음\nSAS~: 두 변 비+끼인각\nSSS~: 세 변 비 모두 같음`,
+ tip:'닮음(~) vs 합동(≅): 닮음=비율만. 최소조건=AA',
+ steps:[['공통각','∠A 공유'],['같은 각','65°=65°'],['결론','AA~']],
+ pracs:[
+  {q:'Minimum to prove triangle similarity:',choices:[{l:'a',t:'1 angle'},{l:'b',t:'2 angles (AA)',correct:true},{l:'c',t:'3 angles'},{l:'d',t:'2 sides'}],expl:'<strong>b. AA</strong><br>2각만 알면 나머지도 결정됨'},
+  {q:'△ABC: 40°,70°,70°. △DEF: 40°,70°,70°. Similar?',choices:[{l:'a',t:'Yes — AA',correct:true},{l:'b',t:'No'},{l:'c',t:'Only if sides equal'},{l:'d',t:'Cannot determine'}],expl:'<strong>a. Yes — AA</strong>'},
+ ]},
+{id:'q99',n:99,topic:'Geometry · Transformation — Reflection',
+ q:'△ABC flipped across x-axis. Transformation applied?',
+ choices:[
+  {l:'a',t:'Translation',correct:false,expl:'❌ Translation=이동. 이건 x축 기준 뒤집힘.'},
+  {l:'b',t:'Rotation 90°',correct:false,expl:'❌ 90°면 옆으로 돌아가야 해요.'},
+  {l:'c',t:'Reflection',correct:true,expl:'✅ 정답! x축 기준 거울 반사 → <strong>Reflection</strong>'},
+  {l:'d',t:'Dilation',correct:false,expl:'❌ Dilation=크기변화. 여기선 같은 크기+반사.'},
+ ],
+ formula:`변환:\nTranslation: (x+a, y+b)\nRotation: 회전\nReflection: x축→(x,-y), y축→(-x,y)\nDilation: 크기변화`,
+ tip:'x축 반사: y값 부호 반전 (x,y)→(x,-y)',
+ steps:[['관찰','x축 기준 위아래 대칭'],['결론','Reflection']],
+ pracs:[
+  {q:'(3,4) reflected across x-axis →',choices:[{l:'a',t:'(-3,4)'},{l:'b',t:'(3,-4)',correct:true},{l:'c',t:'(-3,-4)'},{l:'d',t:'(4,3)'}],expl:'<strong>b. (3,-4)</strong><br>x축 반사: y 부호 반전'},
+  {q:'(2,-5) reflected across y-axis →',choices:[{l:'a',t:'(-2,-5)',correct:true},{l:'b',t:'(2,5)'},{l:'c',t:'(-2,5)'},{l:'d',t:'(5,-2)'}],expl:'<strong>a. (-2,-5)</strong><br>y축 반사: x 부호 반전'},
+ ]},
+{id:'q100',n:100,topic:'Geometry · Composite Transformation',
+ q:'△ABC was transformed. Which composite steps?',
+ choices:[
+  {l:'a',t:'x-axis reflection + CCW 90°',correct:false,expl:'❌ 90°면 가로로 눕혀져야 해요.'},
+  {l:'b',t:'x-axis reflection + CCW 180°',correct:false,expl:'❌ x축반사+180°=y축반사와 같아요.'},
+  {l:'c',t:'x-axis reflection + CCW 270°',correct:false,expl:'❌ 최종 위치 확인 필요.'},
+  {l:'d',t:'y-axis reflection + CCW 180°',correct:true,expl:'✅ 정답! y축 반사+180° 회전'},
+ ],
+ formula:`합성변환:\n1. y축 반사: (x,y)→(-x,y)\n2. 180° 회전: (-x,y)→(x,-y)`,
+ tip:'합성변환은 순서 중요. 각 단계 하나씩 적용',
+ steps:[['y축 반사','(x,y)→(-x,y)'],['180°','(-x,y)→(x,-y)']],
+ pracs:[
+  {q:'(x,y) → x-axis then y-axis reflection →',choices:[{l:'a',t:'(x,y)'},{l:'b',t:'(-x,y)'},{l:'c',t:'(-x,-y)',correct:true},{l:'d',t:'(y,x)'}],expl:'<strong>c. (-x,-y)</strong>'},
+  {q:'180° rotation: (3,-2) →',choices:[{l:'a',t:'(2,3)'},{l:'b',t:'(-3,2)',correct:true},{l:'c',t:'(-2,-3)'},{l:'d',t:'(3,2)'}],expl:'<strong>b. (-3,2)</strong><br>180°: (x,y)→(-x,-y). (3,-2)→(-3,2)'},
+ ]},
+{id:'q101',n:101,topic:'Geometry · Midpoint Formula',
+ q:'Midpoint of line segment from (1,2) to (8,9)?',
+ choices:[
+  {l:'a',t:'(3.5, 4)',correct:false,expl:'❌ M=((1+8)/2,(2+9)/2)=(4.5,5.5)'},
+  {l:'b',t:'(4, 4)',correct:false,expl:'❌ M=(4.5,5.5)'},
+  {l:'c',t:'(4.5, 5.5)',correct:true,expl:'✅ 정답! M=((1+8)/2,(2+9)/2)=<strong>(4.5,5.5)</strong>'},
+  {l:'d',t:'(5, 5)',correct:false,expl:'❌ (1+8)/2=4.5, (2+9)/2=5.5'},
+ ],
+ formula:`중점: M=((x₁+x₂)/2, (y₁+y₂)/2)\n=((1+8)/2,(2+9)/2)=(4.5,5.5)`,
+ tip:'더하고 반으로 나누기',
+ steps:[['x','(1+8)/2=4.5'],['y','(2+9)/2=5.5']],
+ pracs:[
+  {q:'Midpoint of (0,0) and (6,8)?',choices:[{l:'a',t:'(2,4)'},{l:'b',t:'(3,4)',correct:true},{l:'c',t:'(4,3)'},{l:'d',t:'(6,8)'}],expl:'<strong>b. (3,4)</strong>'},
+  {q:'Midpoint of (-4,3) and (2,-1)?',choices:[{l:'a',t:'(-1,1)',correct:true},{l:'b',t:'(1,-1)'},{l:'c',t:'(-2,2)'},{l:'d',t:'(3,-2)'}],expl:'<strong>a. (-1,1)</strong><br>(-4+2)/2=-1, (3-1)/2=1'},
+ ]},
+{id:'q102',n:102,topic:'Geometry · Distance Formula',
+ q:'Distance from (-8,6) to (4,3)?',
+ choices:[
+  {l:'a',t:'√139',correct:false,expl:'❌ d=√(12²+(-3)²)=√153'},
+  {l:'b',t:'√147',correct:false,expl:'❌ =√(144+9)=√153'},
+  {l:'c',t:'√153',correct:true,expl:'✅ 정답! d=√(12²+3²)=<strong>√153</strong>'},
+  {l:'d',t:'√161',correct:false,expl:'❌ Δx=12,Δy=-3: √153'},
+ ],
+ formula:`d=√((x₂-x₁)²+(y₂-y₁)²)\n=√((4+8)²+(3-6)²)\n=√(144+9)=√153`,
+ tip:'Δx=4-(-8)=12, Δy=3-6=-3',
+ steps:[['Δx','4-(-8)=12'],['Δy','3-6=-3'],['d','√(144+9)=√153']],
+ pracs:[
+  {q:'Distance from (0,0) to (3,4)?',choices:[{l:'a',t:'5',correct:true},{l:'b',t:'7'},{l:'c',t:'√7'},{l:'d',t:'√13'}],expl:'<strong>a. 5</strong><br>√(9+16)=5'},
+  {q:'Distance from (1,2) to (4,6)?',choices:[{l:'a',t:'3'},{l:'b',t:'4'},{l:'c',t:'5',correct:true},{l:'d',t:'6'}],expl:'<strong>c. 5</strong><br>√(9+16)=5'},
+ ]},
+{id:'q103',n:103,topic:'Geometry · Trapezoid Perimeter (Coordinate)',
+ q:'Perimeter of trapezoid on coordinate plane?',
+ choices:[
+  {l:'a',t:'4+√10',correct:false,expl:'❌ 각 변 거리합=8+4√5'},
+  {l:'b',t:'8+4√5',correct:true,expl:'✅ 정답! 위4+아래8+경사4×√5=<strong>8+4√5</strong>'},
+  {l:'c',t:'4+2√5',correct:false,expl:'❌ 8+4√5'},
+  {l:'d',t:'8+2√22',correct:false,expl:'❌ 거리공식 재계산: 8+4√5'},
+ ],
+ formula:`둘레=각 변의 거리 합\n위4+아래8+경사변2개×√5\n=8+4√5`,
+ tip:'거리공식 d=√(Δx²+Δy²)으로 각 변 계산',
+ steps:[['평행변','4+8'],['경사변','√(1²+2²)=√5 × 4'],['합','8+4√5']],
+ pracs:[
+  {q:'√((2-0)²+(4-0)²) = ?',choices:[{l:'a',t:'√16'},{l:'b',t:'√18'},{l:'c',t:'√20',correct:true},{l:'d',t:'√24'}],expl:'<strong>c. √20</strong><br>√(4+16)=√20'},
+  {q:'Square (0,0)(4,0)(4,4)(0,4). Perimeter?',choices:[{l:'a',t:'8'},{l:'b',t:'12'},{l:'c',t:'16',correct:true},{l:'d',t:'20'}],expl:'<strong>c. 16</strong><br>4×4=16'},
+ ]},
+{id:'q104',n:104,topic:'Geometry · Area of Irregular Figure',
+ q:'Area of irregular figure (kite/arrow shape) on coordinate plane?',
+ choices:[
+  {l:'a',t:'11 units²',correct:false,expl:'❌ 삼각형 분할 합산=12'},
+  {l:'b',t:'11.5 units²',correct:false,expl:'❌ 12 units²'},
+  {l:'c',t:'12 units²',correct:true,expl:'✅ 정답! <strong>12 units²</strong>'},
+  {l:'d',t:'12.5 units²',correct:false,expl:'❌ 12 units²'},
+ ],
+ formula:`불규칙 도형=삼각형으로 분할\n각 부분 넓이 합산=12 units²`,
+ tip:'격자 도형: 삼각형 분할 또는 외접 직사각형에서 빼기',
+ steps:[['분할','삼각형/사각형으로'],['합산','=12']],
+ pracs:[
+  {q:'Triangle: base=6, height=4. Area?',choices:[{l:'a',t:'10'},{l:'b',t:'12',correct:true},{l:'c',t:'24'},{l:'d',t:'16'}],expl:'<strong>b. 12</strong><br>(1/2)×6×4=12'},
+  {q:'Rectangle 5×4 minus triangle (b=5, h=2). Net area?',choices:[{l:'a',t:'12'},{l:'b',t:'15',correct:true},{l:'c',t:'18'},{l:'d',t:'20'}],expl:'<strong>b. 15</strong><br>20-(1/2×5×2)=15'},
+ ]},
+{id:'q105',n:105,topic:'Geometry · Scale Factor (Dilation)',
+ q:'Scale factor: larger triangle → smaller triangle?',
+ choices:[
+  {l:'a',t:'1/4',correct:false,expl:'❌ 작은/큰=4/6=2/3'},
+  {l:'b',t:'1/3',correct:false,expl:'❌ 2/3'},
+  {l:'c',t:'1/2',correct:false,expl:'❌ 6→4는 ×(2/3)'},
+  {l:'d',t:'2/3',correct:true,expl:'✅ 정답! 4÷6=<strong>2/3</strong>'},
+ ],
+ formula:`Scale = 새 크기 ÷ 원래 크기\n= 4 ÷ 6 = 2/3`,
+ tip:'Scale<1=축소, Scale>1=확대',
+ steps:[['대응변','큰=6, 작은=4'],['비율','4÷6=2/3']],
+ pracs:[
+  {q:'Original=10, new=4. Scale factor?',choices:[{l:'a',t:'2/5',correct:true},{l:'b',t:'1/2'},{l:'c',t:'4/5'},{l:'d',t:'2'}],expl:'<strong>a. 2/5</strong><br>4÷10=2/5'},
+  {q:'Scale=3/2, original=8. New side?',choices:[{l:'a',t:'10'},{l:'b',t:'12',correct:true},{l:'c',t:'14'},{l:'d',t:'16'}],expl:'<strong>b. 12</strong><br>8×(3/2)=12'},
+ ]},
+{id:'q106',n:106,topic:'Geometry · Lines of Symmetry',
+ q:'Lines of symmetry for the diamond (rhombus) shape graphed?',
+ choices:[
+  {l:'a',t:'x=-4, y=6',correct:false,expl:'❌ 마름모 중심축 확인 필요.'},
+  {l:'b',t:'x=4, y=6',correct:true,expl:'✅ 정답! 수직축 x=4, 수평축 y=6'},
+  {l:'c',t:'y=-4, x=6',correct:false,expl:'❌ x와 y 혼동. 수직선=x=상수'},
+  {l:'d',t:'y=4, x=-6',correct:false,expl:'❌ 그래프 중심좌표 확인'},
+ ],
+ formula:`마름모 대칭축:\n수직 대각선: x=상수\n수평 대각선: y=상수`,
+ tip:'수직선:x=c, 수평선:y=c',
+ steps:[['수직','x=4'],['수평','y=6']],
+ pracs:[
+  {q:'Vertical line of symmetry:',choices:[{l:'a',t:'y=c'},{l:'b',t:'x=c',correct:true},{l:'c',t:'y=x'},{l:'d',t:'x+y=c'}],expl:'<strong>b. x=c</strong>'},
+  {q:'A square has how many lines of symmetry?',choices:[{l:'a',t:'2'},{l:'b',t:'3'},{l:'c',t:'4',correct:true},{l:'d',t:'8'}],expl:'<strong>c. 4</strong><br>수평+수직+대각선2=4'},
+ ]},
+{id:'q107',n:107,topic:'Geometry · Tessellation',
+ q:'Which pair of shapes may tessellate a plane?',
+ choices:[
+  {l:'a',t:'Regular pentagons + squares',correct:false,expl:'❌ 정오각형(108°)은 단독/조합 어려움.'},
+  {l:'b',t:'Regular pentagons + equilateral triangles',correct:true,expl:'✅ 정답! 오각형+삼각형 조합 테셀레이션 가능'},
+  {l:'c',t:'Equilateral triangles + regular hexagons',correct:false,expl:'❌ 이것도 가능하지만 b가 정답.'},
+  {l:'d',t:'Regular octagons + equilateral triangles',correct:false,expl:'❌ b가 정답으로 표기.'},
+ ],
+ formula:`테셀레이션: 꼭짓점 각도합=360°\n삼60°×6, 사각90°×4, 육각120°×3`,
+ tip:'빈틈없이 채우기. 꼭짓점에서 각도합=360°',
+ steps:[['정육각형','120°×3=360° 단독 가능'],['조합','오각형+삼각형 ✓']],
+ pracs:[
+  {q:'Which regular polygon tessellates alone?',choices:[{l:'a',t:'Pentagon'},{l:'b',t:'Hexagon',correct:true},{l:'c',t:'Octagon'},{l:'d',t:'Decagon'}],expl:'<strong>b. Hexagon</strong><br>120°×3=360°'},
+  {q:'Interior angle of regular hexagon?',choices:[{l:'a',t:'108°'},{l:'b',t:'115°'},{l:'c',t:'120°',correct:true},{l:'d',t:'135°'}],expl:'<strong>c. 120°</strong><br>(6-2)×180/6=120°'},
+ ]},
+{id:'q108',n:108,topic:'Number Sense · Fraction × Mixed Number',
+ q:'Administer 1/12 of a bottle with 3⁴⁄₁₀ fl oz. How much?',
+ choices:[
+  {l:'a',t:'17/60 fl oz',correct:false,expl:'❌ 34/10×1/12=34/120=17/60 ← 실제로 맞아요!'},
+  {l:'b',t:'13/62 fl oz',correct:false,expl:'❌ 34/120=17/60'},
+  {l:'c',t:'19/60 fl oz',correct:false,expl:'❌ 34/120=17/60'},
+  {l:'d',t:'17/60 fl oz',correct:true,expl:'✅ 정답! 34/10×1/12=34/120=<strong>17/60</strong>'},
+ ],
+ formula:`3⁴⁄₁₀ = 34/10\n34/10 × 1/12 = 34/120 = 17/60`,
+ tip:'대분수→가분수: 3⁴⁄₁₀=(3×10+4)/10=34/10',
+ steps:[['변환','3⁴⁄₁₀=34/10'],['곱','34/10×1/12=17/60']],
+ pracs:[
+  {q:'2¾ as improper fraction?',choices:[{l:'a',t:'7/4'},{l:'b',t:'9/4'},{l:'c',t:'11/4',correct:true},{l:'d',t:'13/4'}],expl:'<strong>c. 11/4</strong><br>(2×4+3)/4=11/4'},
+  {q:'½ of 4⅔ = ?',choices:[{l:'a',t:'1⅓'},{l:'b',t:'2⅓',correct:true},{l:'c',t:'3⅓'},{l:'d',t:'4'}],expl:'<strong>b. 2⅓</strong><br>14/3×1/2=7/3=2⅓'},
+ ]},
+{id:'q109',n:109,topic:'Algebra · Slope from Graph',
+ q:'Slope of leg x in triangle. Points: (-4,0) and (-3,4)',
+ choices:[
+  {l:'a',t:'2',correct:false,expl:'❌ m=(4-0)/(-3-(-4))=4/1=4'},
+  {l:'b',t:'3.5',correct:false,expl:'❌ m=4/1=4'},
+  {l:'c',t:'4',correct:true,expl:'✅ 정답! m=(4-0)/(-3+4)=<strong>4</strong>'},
+  {l:'d',t:'4.5',correct:false,expl:'❌ m=4/1=4'},
+ ],
+ formula:`m=(y₂-y₁)/(x₂-x₁)\n=(4-0)/(-3-(-4))=4/1=4`,
+ tip:'기울기=Δy/Δx',
+ steps:[['두점','(-4,0),(-3,4)'],['m','(4-0)/(−3+4)=4']],
+ pracs:[
+  {q:'Slope through (0,0) and (3,6)?',choices:[{l:'a',t:'1'},{l:'b',t:'2',correct:true},{l:'c',t:'3'},{l:'d',t:'6'}],expl:'<strong>b. 2</strong><br>6/3=2'},
+  {q:'Slope of y=-3x+5?',choices:[{l:'a',t:'5'},{l:'b',t:'3'},{l:'c',t:'-3',correct:true},{l:'d',t:'-5'}],expl:'<strong>c. -3</strong>'},
+ ]},
+{id:'q110',n:110,topic:'Geometry · Distance with Scale',
+ q:'A→B→C→A trip. Each unit=5 miles. Total distance?',
+ choices:[
+  {l:'a',t:'42 miles',correct:false,expl:'❌ 각 구간 거리×5 합산≈64'},
+  {l:'b',t:'48 miles',correct:false,expl:'❌ ≈64 miles'},
+  {l:'c',t:'56 miles',correct:false,expl:'❌ ≈64 miles'},
+  {l:'d',t:'64 miles',correct:true,expl:'✅ 정답! 각 구간 합≈<strong>64 miles</strong>'},
+ ],
+ formula:`단위=5마일\n각 변 거리공식으로 계산 후 ×5 합산\n≈64 miles`,
+ tip:'각 구간 거리공식→단위변환(×5)→합산',
+ steps:[['각 구간','거리공식 적용'],['×5','단위변환'],['합','≈64 miles']],
+ pracs:[
+  {q:'1 unit=3 miles. Distance 4 units=?',choices:[{l:'a',t:'7'},{l:'b',t:'9'},{l:'c',t:'12',correct:true},{l:'d',t:'15'}],expl:'<strong>c. 12</strong><br>4×3=12'},
+  {q:'(0,0)→(3,4), each unit=2 miles. Distance?',choices:[{l:'a',t:'5'},{l:'b',t:'8'},{l:'c',t:'10',correct:true},{l:'d',t:'12'}],expl:'<strong>c. 10</strong><br>√25=5 units × 2=10'},
+ ]},
+];
+
+// ══════════════════════════════════════════════
+// BUILD CARDS
+// ══════════════════════════════════════════════
+function buildCard(q){
+  const el=document.createElement('div');
+  el.className='card';el.id=q.id;
+  const cH=q.choices.map((c,i)=>`
+    <button class="qcbtn" onclick="ansQ('${q.id}',${!!c.correct},this,${i})" data-i="${i}">
+      <span class="ql">${c.l}</span><span>${c.t}</span>
+    </button>`).join('');
+  el.innerHTML=`
+  <div class="ch"><div class="cnr"><div class="cnum">${q.n}</div><div class="ct">
+    <div class="ctopic">${q.topic}</div>
+    <div class="cq">${q.q}</div>
+    <div class="qchoices">${cH}</div>
+    <div class="qfb" id="qfb-${q.id}"></div>
+  </div></div></div>
+  <button class="ab open" onclick="tog(this)"><div class="ab-l"><div class="ab-ic if">📐</div><div class="abt">적용 공식</div></div><span class="aarr">▼</span></button>
+  <div class="body open"><div class="fbox">${q.formula}</div></div>
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic it">💡</div><div class="abt">팁과 요령</div></div><span class="aarr">▼</span></button>
+  <div class="body"><div class="tbox">${q.tip}</div></div>
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic is">✏️</div><div class="abt">풀이 과정</div></div><span class="aarr">▼</span></button>
+  <div class="body">${q.steps.map((s,i)=>`<div class="step"><div class="sn">${i+1}</div><div class="sc">${s[0]}<span class="sm">${s[1]}</span></div></div>`).join('')}</div>
+  <button class="ab" onclick="tog(this)"><div class="ab-l"><div class="ab-ic ip">🔥</div><div class="abt">응용 문제 — 클릭으로 선택</div></div><span class="aarr">▼</span></button>
+  <div class="body">${q.pracs.map((p,pi)=>`
+    <div class="pi"><div class="pl2">응용 ${pi+1}</div><div class="pq">${p.q}</div>
+    <div class="pchoices">${p.choices.map((c,ci)=>`
+      <button class="pcbtn" onclick="ansP('${q.id}-p${pi}',${!!c.correct},this,${ci})">
+        <span class="pl">${c.l}</span><span>${c.t}</span>
+      </button>`).join('')}</div>
+    <div class="pfb" id="pfb-${q.id}-p${pi}"></div></div>`).join('')}
+  </div>`;
+  return el;
+}
+const cc=document.getElementById('cardsContainer');
+QS.forEach(q=>cc.appendChild(buildCard(q)));
+const io=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis')});},{threshold:0.04});
+document.querySelectorAll('.card').forEach(c=>io.observe(c));
+document.querySelectorAll('.ab.open').forEach(b=>b.nextElementSibling.classList.add('open'));
+
+function ansQ(id,ok,btn,idx){
+  const btns=btn.closest('.qchoices').querySelectorAll('.qcbtn');
+  btns.forEach(b=>{b.disabled=true;b.style.cursor='default'});
+  btn.classList.add(ok?'correct':'wrong');
+  if(!ok){const q=QS.find(x=>x.id===id);btns.forEach((b,i)=>{if(q.choices[i].correct)b.classList.add('show-correct')})}
+  const fb=document.getElementById('qfb-'+id);
+  fb.innerHTML=QS.find(x=>x.id===id).choices[idx].expl;
+  fb.className='qfb show '+(ok?'ok':'ng');
+}
+function ansP(gid,ok,btn,idx){
+  const btns=btn.closest('.pchoices').querySelectorAll('.pcbtn');
+  btns.forEach(b=>{b.disabled=true;b.style.cursor='default'});
+  btn.classList.add(ok?'correct':'wrong');
+  const qid=gid.split('-p')[0],pi=parseInt(gid.split('-p')[1]);
+  const q=QS.find(x=>x.id===qid);
+  if(!ok)btns.forEach((b,i)=>{if(q.pracs[pi].choices[i]&&q.pracs[pi].choices[i].correct)b.classList.add('show-correct')});
+  const fb=document.getElementById('pfb-'+gid);
+  fb.innerHTML=`<div class="pfh">${ok?'✅ 정답이에요!':'❌ 다시 확인해봐요!'}</div>${q.pracs[pi].expl}`;
+  fb.className='pfb show '+(ok?'ok':'ng');
+}
+function tog(b){b.classList.toggle('open');b.nextElementSibling.classList.toggle('open')}
+
+// ══════════════════════════════════════════════════════════════
+// PINCH ZOOM — 완전히 새로 구현
+// 핵심 설계:
+//   1. body의 기본 스크롤은 유지 (touch-action:pan-y)
+//   2. 두 손가락 감지 시에만 기본 동작 막고 핀치줌 적용
+//   3. #zoomLayer 에 transform:scale() 적용 (transform-origin:top center)
+//   4. 감도: 이전 ratio 방식 대신 damping 적용으로 부드럽게
+// ══════════════════════════════════════════════════════════════
+const zoomLayer = document.getElementById('zoomLayer');
+const badge = document.getElementById('zoomBadge');
+
+let curScale = 1;
+const MIN_SCALE = 0.6;
+const MAX_SCALE = 4.0;
+const DAMPING = 0.4;  // 0~1: 낮을수록 느리게 반응 (감도 조절)
+
+let badgeTimer = null;
+
+function showBadge() {
+  badge.textContent = '🔍 ' + Math.round(curScale * 100) + '%';
+  badge.classList.add('show');
+  clearTimeout(badgeTimer);
+  badgeTimer = setTimeout(() => badge.classList.remove('show'), 1500);
+}
+
+function applyScale(s, animate) {
+  curScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, s));
+  zoomLayer.style.transition = animate ? 'transform 0.2s ease-out' : 'none';
+  zoomLayer.style.transform = `scale(${curScale})`;
+  zoomLayer.style.transformOrigin = 'top center';
+  showBadge();
+}
+
+// --- Pinch state ---
+let pinchActive = false;
+let pinchStartDist = 0;
+let pinchStartScale = 1;
+
+function getTouchDist(t) {
+  const dx = t[0].clientX - t[1].clientX;
+  const dy = t[0].clientY - t[1].clientY;
+  return Math.hypot(dx, dy);
+}
+
+// touchstart: 두 손가락이면 핀치 시작
+document.addEventListener('touchstart', function(e) {
+  // 도구 열려있으면 무시
+  if (document.getElementById('scratchPanel').classList.contains('open')) return;
+  if (document.getElementById('calcPanel').classList.contains('open')) return;
+
+  if (e.touches.length === 2) {
+    pinchActive = true;
+    pinchStartDist = getTouchDist(e.touches);
+    pinchStartScale = curScale;
+    e.preventDefault(); // 두 손가락 → 기본동작(브라우저 줌) 막기
+  } else {
+    pinchActive = false;
+  }
+}, { passive: false });
+
+// touchmove: 두 손가락이고 핀치 활성 → 줌 적용
+document.addEventListener('touchmove', function(e) {
+  if (document.getElementById('scratchPanel').classList.contains('open')) return;
+  if (document.getElementById('calcPanel').classList.contains('open')) return;
+
+  if (pinchActive && e.touches.length === 2) {
+    e.preventDefault(); // 스크롤 막기
+
+    const newDist = getTouchDist(e.touches);
+    const rawRatio = newDist / pinchStartDist;
+
+    // DAMPING: 1에서의 차이를 줄여서 감도 완화
+    // rawRatio=1.2 (20% 확대) → dampedRatio=1+0.2*DAMPING=1.08 (8% 확대)
+    const dampedRatio = 1 + (rawRatio - 1) * DAMPING;
+    const newScale = pinchStartScale * dampedRatio;
+
+    applyScale(newScale, false);
+  }
+  // 한 손가락은 기본 스크롤 그대로 (touch-action:pan-y가 처리)
+}, { passive: false });
+
+// touchend
+document.addEventListener('touchend', function(e) {
+  if (e.touches.length < 2) {
+    if (pinchActive) {
+      pinchActive = false;
+      // 너무 작아졌으면 1로 복귀
+      if (curScale < 1) {
+        setTimeout(() => applyScale(1, true), 100);
+      }
+    }
+  }
+}, { passive: true });
+
+// 더블탭 리셋
+let lastTap = 0;
+document.addEventListener('touchend', function(e) {
+  if (e.touches.length > 0) return;
+  const now = Date.now();
+  if (now - lastTap < 280) {
+    applyScale(1, true);
+  }
+  lastTap = now;
+}, { passive: true });
+
+// 버튼 줌
+function btnZoom(delta) {
+  applyScale(curScale + delta, true);
+}
+
+// 데스크탑 마우스 휠
+document.addEventListener('wheel', function(e) {
+  if (document.getElementById('scratchPanel').classList.contains('open')) return;
+  if (e.ctrlKey || e.metaKey) { // Ctrl+휠만 줌
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.1 : 0.1;
+    applyScale(curScale + delta, false);
+  }
+}, { passive: false });
+
+// ══════════════════════════════════════════════
+// SCRATCHPAD
+// ══════════════════════════════════════════════
+let drawing=false,tool='pen',penColor='#ffff00',bsz=3,lx=0,ly=0;
+const sp=document.getElementById('scratchPanel');
+const cv=document.getElementById('spCanvas');
+const ctx=cv.getContext('2d');
+const bd=document.getElementById('backdrop');
+
+function openScratch(){
+  bd.classList.add('open');
+  sp.classList.add('open');
+  resizeCv();
+}
+function closeScratch(){bd.classList.remove('open');sp.classList.remove('open')}
+function resizeCv(){
+  const w=cv.offsetWidth,h=cv.offsetHeight;
+  if(!w||!h){setTimeout(resizeCv,50);return}
+  const img=ctx.getImageData(0,0,cv.width,cv.height);
+  cv.width=w;cv.height=h;ctx.putImageData(img,0,0);
+  ctx.lineCap='round';ctx.lineJoin='round';
+}
+window.addEventListener('resize',()=>{if(sp.classList.contains('open'))resizeCv()});
+function gp(e){const r=cv.getBoundingClientRect();if(e.touches)return{x:e.touches[0].clientX-r.left,y:e.touches[0].clientY-r.top};return{x:e.clientX-r.left,y:e.clientY-r.top}}
+function startD(e){drawing=true;const p=gp(e);lx=p.x;ly=p.y;e.preventDefault()}
+function drawL(e){
+  if(!drawing)return;e.preventDefault();
+  const p=gp(e);
+  ctx.beginPath();
+  if(tool==='eraser'){
+    ctx.globalCompositeOperation='destination-out';
+    ctx.lineWidth=bsz*5;
+  }else{
+    ctx.globalCompositeOperation='source-over';
+    ctx.strokeStyle=penColor;
+    ctx.lineWidth=bsz;
+  }
+  ctx.moveTo(lx,ly);ctx.lineTo(p.x,p.y);ctx.stroke();
+  lx=p.x;ly=p.y;
+}
+function stopD(){drawing=false}
+cv.addEventListener('mousedown',startD);cv.addEventListener('mousemove',drawL);
+cv.addEventListener('mouseup',stopD);cv.addEventListener('mouseleave',stopD);
+cv.addEventListener('touchstart',startD,{passive:false});
+cv.addEventListener('touchmove',drawL,{passive:false});
+cv.addEventListener('touchend',stopD);
+function setTool(t){tool=t;document.getElementById('penBtn').classList.toggle('at',t==='pen');document.getElementById('eraserBtn').classList.toggle('at',t==='eraser')}
+function setC(el){document.querySelectorAll('.csw').forEach(s=>s.classList.remove('sel'));el.classList.add('sel');penColor=el.dataset.c;if(tool==='eraser')setTool('pen')}
+function clearC(){ctx.clearRect(0,0,cv.width,cv.height)}
+function upSz(){bsz=parseInt(document.getElementById('bsz').value);document.getElementById('szLbl').textContent=bsz+'px'}
+
+// ══════════════════════════════════════════════
+// CALCULATOR
+// ══════════════════════════════════════════════
+let expr='',res=null,justEv=false,is2nd=false;
+const cMain=document.getElementById('cMain');
+const cHist=document.getElementById('cHist');
+function openCalc(){bd.classList.add('open');document.getElementById('calcPanel').classList.add('open')}
+function closeCalc(){bd.classList.remove('open');document.getElementById('calcPanel').classList.remove('open')}
+function updS(){cMain.innerHTML=(expr||'0')+'<span class="cur"></span>'}
+function fmt(s){return s.replace(/\*/g,'×').replace(/\//g,'÷').replace(/Math\.PI/g,'π').replace(/Math\.sqrt\(/g,'√(').replace(/Math\.log10\(/g,'log(').replace(/Math\.log\(/g,'ln(').replace(/Math\.sin\(/g,'sin(').replace(/Math\.cos\(/g,'cos(').replace(/Math\.tan\(/g,'tan(').replace(/\*\*/g,'^')}
+function sErr(m='ERR'){cMain.innerHTML=`<span style="color:#2a5010;font-size:12px">${m}</span>`;cHist.innerHTML='';expr='';res=null;justEv=false}
+function cp(k){
+  if(k==='2nd'){is2nd=!is2nd;return}
+  if(is2nd){is2nd=false;if(k==='sq')k='sqrt';if(k==='sin')k='asin';if(k==='cos')k='acos';if(k==='tan')k='atan';if(k==='log')k='ex10';if(k==='ln')k='exE'}
+  if(justEv&&'0123456789.'.includes(k)){expr='';res=null;justEv=false}
+  if(justEv&&['add','sub','mul','div','pow'].includes(k)){expr=res!==null?String(res):expr;justEv=false}
+  switch(k){
+    case 'on':expr='';res=null;justEv=false;cMain.innerHTML='0<span class="cur"></span>';cHist.innerHTML='';break;
+    case 'clr':if(!expr){res=null;cHist.innerHTML=''}expr='';justEv=false;updS();break;
+    case 'del':if(expr){['Math.sqrt(','Math.log10(','Math.log(','Math.sin(','Math.cos(','Math.tan(','Math.asin(','Math.acos(','Math.atan(','Math.PI'].forEach(t=>{if(expr.endsWith(t))expr=expr.slice(0,-t.length)});if(expr)expr=expr.slice(0,-1);updS()}break;
+    case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':expr+=k;updS();break;
+    case 'dot':if(!expr.split(/[+\-*/()]/).pop().includes('.')){expr+='.';updS()}break;
+    case 'neg':expr=expr?'-'+expr:'-';justEv=false;updS();break;
+    case 'add':expr+='+';justEv=false;updS();break;case 'sub':expr+='-';justEv=false;updS();break;
+    case 'mul':expr+='*';justEv=false;updS();break;case 'div':expr+='/';justEv=false;updS();break;
+    case 'pow':expr+='**';justEv=false;updS();break;case 'lp':expr+='(';updS();break;case 'rp':expr+=')';updS();break;
+    case 'pi':expr+='Math.PI';updS();break;case 'sq':expr+='**2';updS();break;case 'sqrt':expr+='Math.sqrt(';updS();break;
+    case 'inv':expr+='**(-1)';updS();break;case 'sin':expr+='Math.sin(d2r(';updS();break;case 'cos':expr+='Math.cos(d2r(';updS();break;
+    case 'tan':expr+='Math.tan(d2r(';updS();break;case 'asin':expr+='r2d(Math.asin(';updS();break;case 'acos':expr+='r2d(Math.acos(';updS();break;
+    case 'atan':expr+='r2d(Math.atan(';updS();break;case 'log':expr+='Math.log10(';updS();break;case 'ln':expr+='Math.log(';updS();break;
+    case 'ex10':expr+='10**(';updS();break;case 'exE':expr+='Math.exp(';updS();break;
+    case 'sci':if(res!==null)cMain.innerHTML=res.toExponential(4)+'<span class="cur"></span>';break;
+    case 'enter':
+      if(!expr)return;
+      cHist.innerHTML=fmt(expr)+' =';
+      try{
+        let s=expr;const op=(s.match(/\(/g)||[]).length,cl=(s.match(/\)/g)||[]).length;
+        for(let i=0;i<op-cl;i++)s+=')';
+        const fn=new Function('d2r','r2d',`"use strict";return(${s})`);
+        let v=fn(d=>d*Math.PI/180,r=>r*180/Math.PI);
+        if(!isFinite(v)){sErr('÷0');return}if(isNaN(v)){sErr('ERR');return}
+        let d=Number.isInteger(v)&&Math.abs(v)<1e15?v.toString():parseFloat(v.toPrecision(10)).toString();
+        res=v;expr=d;justEv=true;cMain.innerHTML=d+'<span class="cur"></span>';
+      }catch(e){sErr('SYN')}break;
+  }
+}
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('calcPanel').classList.contains('open')){
+    const m={'0':'0','1':'1','2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9','+':'add','-':'sub','*':'mul','/':'div','^':'pow','(':'lp',')':'rp','.':'dot','Enter':'enter','Backspace':'del','Escape':'clr'};
+    if(m[e.key]){e.preventDefault();cp(m[e.key])}
+  }
+});
+</script>
+</body>
+</html>
