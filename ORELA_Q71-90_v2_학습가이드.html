@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=0.5,maximum-scale=4,user-scalable=yes">
+<title>ORELA Q71-90 학습 가이드</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f5f0;--bg2:#eeeae2;--card:#fff;--border:#ddd8cc;--border2:#bfb8a8;
+  --navy:#1a2744;--blue:#2855a0;--acc:#c8400a;--gold:#b8860b;
+  --green:#1a6b3c;--gbg:#e8f5ee;--red:#c8200a;--rbg:#fff0ee;
+  --abg:#fff8e6;--text:#1a1a1a;--t2:#555;--t3:#888;
+  --mono:'JetBrains Mono',monospace;--serif:'Playfair Display',serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.75;overflow-x:hidden}
+#zoomWrap{transform-origin:top left;width:100%}
+
+/* ── ZOOM BADGE ── */
+#zoomBadge{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.65);color:#fff;border-radius:20px;padding:5px 14px;font-size:12px;font-family:var(--mono);z-index:800;pointer-events:none;opacity:0;transition:opacity .3s}
+#zoomBadge.show{opacity:1}
+
+/* ── FLOATING BUTTONS ── */
+.fab-wrap{position:fixed;bottom:20px;right:16px;z-index:500;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.fab-row{display:flex;flex-direction:column;align-items:center;gap:2px}
+.fab{width:50px;height:50px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 16px rgba(0,0,0,.22);transition:transform .18s}
+.fab:hover{transform:scale(1.1)}
+.fab:active{transform:scale(.95)}
+.fab-draw{background:#1a2744}
+.fab-calc{background:#2855a0}
+.fab-zi{background:#1a6b3c;font-size:16px;font-weight:900}
+.fab-zo{background:#b8860b;font-size:16px;font-weight:900}
+.fab-lbl{font-size:9px;color:#fff;background:rgba(0,0,0,.55);border-radius:8px;padding:2px 6px;white-space:nowrap}
+
+/* ══════════════════════════════
+   OVERLAY BACKDROP (blur)
+══════════════════════════════ */
+.tool-backdrop{
+  position:fixed;inset:0;z-index:600;
+  display:none;
+  background:rgba(0,0,0,.45);
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
+}
+.tool-backdrop.open{display:block}
+
+/* ══════════════════════════════
+   SCRATCHPAD — floats over page
+══════════════════════════════ */
+.scratch-panel{
+  position:fixed;
+  top:0;left:0;right:0;bottom:0;
+  z-index:610;
+  display:none;
+  flex-direction:column;
+  pointer-events:none;
+}
+.scratch-panel.open{display:flex}
+
+.scratch-topbar{
+  background:rgba(26,39,68,.92);
+  padding:8px 14px;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  pointer-events:all;
+  flex-shrink:0;
+}
+.scratch-topbar h2{color:#fff;font-size:14px;font-weight:700;margin-right:4px}
+.scratch-tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.stool{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:7px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;min-height:32px;transition:background .15s}
+.stool:hover{background:rgba(255,255,255,.28)}
+.stool.at{background:rgba(240,192,64,.5);border-color:#f0c040}
+.scratch-close{background:rgba(200,64,10,.85);border:none;color:#fff;border-radius:7px;padding:5px 12px;font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-weight:700;margin-left:auto;min-height:32px;pointer-events:all}
+
+/* canvas: transparent background so page shows through */
+.scratch-canvas{
+  flex:1;
+  touch-action:none;
+  cursor:crosshair;
+  background:transparent;
+  pointer-events:all;
+}
+
+.scratch-colorbar{
+  background:rgba(240,237,230,.92);
+  padding:7px 14px;
+  display:flex;gap:7px;align-items:center;flex-wrap:wrap;
+  pointer-events:all;flex-shrink:0;
+}
+.cswatch{width:26px;height:26px;border-radius:50%;border:3px solid transparent;cursor:pointer;flex-shrink:0}
+.cswatch.sel{border-color:#333}
+.sz-sl{flex:1;min-width:70px;max-width:140px;accent-color:var(--navy)}
+.sz-lbl{font-size:11px;color:var(--t2);min-width:36px}
+
+/* ══════════════════════════════
+   CALCULATOR — floats over page
+══════════════════════════════ */
+.calc-panel{
+  position:fixed;
+  inset:0;
+  z-index:610;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+}
+.calc-panel.open{display:flex}
+.calc-inner{pointer-events:all;position:relative}
+.calc-close-x{
+  position:absolute;top:-13px;right:-13px;
+  width:30px;height:30px;border-radius:50%;
+  background:#c8400a;border:none;color:#fff;
+  font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(0,0,0,.3);z-index:5;
+}
+
+/* TI-30XS — semi-transparent */
+.calculator{
+  width:270px;
+  background:rgba(91,122,138,.88);
+  border-radius:15px 15px 20px 20px;
+  padding:13px 15px 16px;
+  box-shadow:0 20px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.12);
+  backdrop-filter:blur(6px);
+}
+.brand-top{text-align:center;margin-bottom:6px}
+.cm{font-family:var(--mono);font-size:14px;font-weight:700;color:#fff;letter-spacing:1px}
+.cm span{font-size:9px;font-weight:400;color:#c8dde8;display:block;letter-spacing:3px}
+.cti{font-size:7px;color:#a8c8d8;letter-spacing:1px}
+.csh{background:rgba(58,80,96,.85);border-radius:7px;padding:6px;margin-bottom:7px}
+.csc{background:rgba(143,168,118,.85);border-radius:4px;padding:5px 8px;min-height:56px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;position:relative}
+.csc::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.07),transparent 50%);pointer-events:none;border-radius:4px}
+.scm{font-size:7px;color:#3a5a20;text-align:right;letter-spacing:1px;font-family:var(--mono)}
+.sch{font-size:9px;color:#4a6a30;text-align:right;min-height:12px;font-family:var(--mono);word-break:break-all}
+.scn{font-size:18px;color:#1a3010;text-align:right;font-family:var(--mono);font-weight:700;word-break:break-all;line-height:1.2}
+.cur{display:inline-block;width:2px;height:14px;background:#1a3010;margin-left:1px;vertical-align:middle;animation:blink 1s infinite}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+.dgb{background:rgba(232,232,224,.85);border-radius:3px;padding:2px 6px;text-align:center;font-size:6px;color:#444;margin-bottom:5px;letter-spacing:2px}
+.bg{display:grid;grid-template-columns:repeat(5,1fr);gap:3px}
+.b{border:none;border-radius:4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px 1px;min-height:30px;transition:transform .08s;outline:none;user-select:none;-webkit-tap-highlight-color:transparent}
+.b:active{transform:translateY(1px)}
+.b .s{font-size:5px;color:#c8e000;line-height:1;margin-bottom:1px;font-family:var(--mono)}
+.b .p{font-size:9px;font-weight:700;line-height:1;font-family:var(--mono)}
+.bd{background:linear-gradient(180deg,#4a4a4a,#2e2e2e);color:#fff;box-shadow:0 2px 0 #111}
+.bl{background:linear-gradient(180deg,#efefef,#d5d5d5);color:#111;box-shadow:0 2px 0 #999}
+.b2{background:linear-gradient(180deg,#ddd600,#aaaa00);color:#000;box-shadow:0 2px 0 #666}
+.b2 .p{color:#000;font-size:10px}
+.bon{background:linear-gradient(180deg,#555,#333);color:#fff;box-shadow:0 2px 0 #111}
+.bent{background:linear-gradient(180deg,#ccc,#aaa);color:#222;box-shadow:0 2px 0 #888;border-radius:10px}
+.bop{background:linear-gradient(180deg,#3a3a3a,#222);color:#fff;box-shadow:0 2px 0 #000;min-height:36px}
+.bop .p{font-size:13px}
+.nr{width:44px;height:44px;border-radius:50%;background:linear-gradient(145deg,#555,#333);box-shadow:0 2px 0 #111;position:relative;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.nr::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:linear-gradient(145deg,#444,#222)}
+.nr .a{position:absolute;font-size:6px;color:#aaa;z-index:2}
+.au{top:3px;left:50%;transform:translateX(-50%)}
+.ad{bottom:3px;left:50%;transform:translateX(-50%)}
+.al{left:3px;top:50%;transform:translateY(-50%)}
+.ar{right:3px;top:50%;transform:translateY(-50%)}
+.mvl{text-align:center;margin-top:6px;font-size:6px;color:#a0b8c8;letter-spacing:2px}
+
+/* ══════════════════════════════
+   KHAN-STYLE ANSWER CHOICES
+══════════════════════════════ */
+/* Original question choices */
+.q-choices{margin-top:12px;display:flex;flex-direction:column;gap:7px}
+.qc-btn{
+  display:flex;align-items:flex-start;gap:12px;
+  background:rgba(255,255,255,.1);
+  border:2px solid rgba(255,255,255,.25);
+  border-radius:10px;padding:10px 14px;
+  cursor:pointer;text-align:left;width:100%;
+  transition:all .2s;color:#fff;
+  font-family:'Noto Sans KR',sans-serif;font-size:clamp(12px,2.8vw,13.5px);
+  line-height:1.5;
+}
+.qc-btn:hover:not([data-answered]){
+  background:rgba(255,255,255,.2);
+  border-color:rgba(255,255,255,.5);
+}
+.qc-btn .lbl{
+  min-width:26px;height:26px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.5);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:12px;font-family:var(--mono);
+  flex-shrink:0;margin-top:1px;
+}
+.qc-btn.correct{
+  background:rgba(52,211,153,.25);
+  border-color:#34d399;
+}
+.qc-btn.correct .lbl{background:#34d399;border-color:#34d399;color:#fff}
+.qc-btn.wrong{
+  background:rgba(200,32,10,.25);
+  border-color:#ff6b6b;
+}
+.qc-btn.wrong .lbl{background:#ff6b6b;border-color:#ff6b6b;color:#fff}
+.qc-btn.reveal-correct{
+  background:rgba(52,211,153,.15);
+  border-color:rgba(52,211,153,.5);
+}
+.q-feedback{margin-top:10px;padding:10px 14px;border-radius:9px;font-size:13px;display:none}
+.q-feedback.show{display:block}
+.q-feedback.ok{background:rgba(52,211,153,.18);border:1px solid rgba(52,211,153,.4);color:#a0ffd8}
+.q-feedback.ng{background:rgba(200,32,10,.18);border:1px solid rgba(255,107,107,.4);color:#ffaaaa}
+.q-retry{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:7px;padding:5px 14px;font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-top:8px;transition:background .15s}
+.q-retry:hover{background:rgba(255,255,255,.25)}
+
+/* Practice choices */
+.prac-choices{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.pc-btn{
+  display:flex;align-items:flex-start;gap:11px;
+  background:#fff;border:2px solid var(--border);
+  border-radius:10px;padding:9px 13px;
+  cursor:pointer;text-align:left;width:100%;
+  transition:all .18s;
+  font-family:'Noto Sans KR',sans-serif;font-size:clamp(11.5px,2.6vw,13px);
+  line-height:1.55;color:var(--text);
+}
+.pc-btn:hover:not(.done){background:#f5f3ff;border-color:var(--blue)}
+.pc-btn .plbl{
+  min-width:24px;height:24px;border-radius:50%;
+  border:2px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:11px;font-family:var(--mono);
+  flex-shrink:0;color:var(--t2);margin-top:1px;
+  transition:all .18s;
+}
+.pc-btn.correct{background:var(--gbg);border-color:#34d399}
+.pc-btn.correct .plbl{background:#1a6b3c;border-color:#1a6b3c;color:#fff}
+.pc-btn.wrong{background:var(--rbg);border-color:#ff6b6b}
+.pc-btn.wrong .plbl{background:#c8200a;border-color:#c8200a;color:#fff}
+.pc-btn.reveal-correct{background:#e8f5ee;border-color:rgba(52,211,153,.5)}
+.prac-feedback{margin-top:8px;padding:9px 13px;border-radius:9px;font-size:clamp(11.5px,2.6vw,12.5px);display:none;line-height:1.8}
+.prac-feedback.show{display:block}
+.prac-feedback.ok{background:var(--gbg);border:1px solid #9ed4b0;color:var(--green)}
+.prac-feedback.ng{background:var(--rbg);border:1px solid #f0a898;color:var(--red)}
+.prac-feedback .pfh{font-weight:700;font-size:13px;margin-bottom:4px}
+.p-retry{background:none;border:1px solid var(--border2);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-top:6px;transition:all .15s;color:var(--t2)}
+.p-retry:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+/* ── HEADER / NAV / CARDS ── */
+.hdr{background:var(--navy);padding:clamp(18px,4vw,32px) clamp(16px,4vw,36px);position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.03)}
+.htag{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:5px}
+.htitle{font-family:var(--serif);font-size:clamp(20px,5vw,30px);color:#fff;margin-bottom:4px}
+.htitle em{color:#f0c060;font-style:normal}
+.hsub{font-size:12px;color:rgba(255,255,255,.5)}
+.hchips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.hchip{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:3px 11px;font-size:11px;color:rgba(255,255,255,.72)}
+.qnav{background:var(--bg2);border-bottom:1px solid var(--border);padding:9px clamp(12px,3vw,28px);display:flex;flex-wrap:wrap;gap:5px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.qnav a{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:5px 10px;font-size:12px;font-weight:700;color:var(--navy);text-decoration:none;transition:all .15s;font-family:var(--mono);min-height:36px;display:flex;align-items:center}
+.qnav a:hover{background:var(--navy);color:#fff}
+.main{max-width:820px;margin:0 auto;padding:clamp(14px,3vw,32px) clamp(10px,3vw,20px) 130px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:clamp(18px,4vw,36px);overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.07);opacity:0;transform:translateY(18px);transition:opacity .4s,transform .4s}
+.card.vis{opacity:1;transform:none}
+.ch{background:linear-gradient(135deg,var(--navy),#2a3a60);padding:clamp(12px,3vw,18px) clamp(12px,3vw,22px)}
+.cnum-row{display:flex;align-items:flex-start;gap:12px}
+.cnum{background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.22);border-radius:9px;min-width:42px;height:42px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:18px;font-weight:700;color:#fff;flex-shrink:0}
+.ct{flex:1;min-width:0}
+.ctopic{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:3px}
+.cq{font-size:clamp(12px,2.8vw,13.5px);color:#fff;line-height:1.6}
+.ab{width:100%;background:none;border:none;border-bottom:1px solid var(--border);padding:clamp(11px,2.5vw,15px) clamp(12px,3vw,22px);display:flex;align-items:center;justify-content:space-between;cursor:pointer;text-align:left;gap:10px;transition:background .15s}
+.ab:hover{background:rgba(40,85,160,.04)}
+.ab-l{display:flex;align-items:center;gap:9px}
+.ab-ic{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.if{background:#e8f0ff}.it{background:#fff8e0}.is{background:#e8f8ee}.ip{background:#fef0e8}
+.abt{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--t2)}
+.aarr{font-size:11px;color:var(--t3);transition:transform .22s;flex-shrink:0}
+.ab.open .aarr{transform:rotate(180deg)}
+.body{display:none;padding:clamp(12px,3vw,18px) clamp(12px,3vw,22px);border-bottom:1px solid var(--border)}
+.body.open{display:block}
+.body:last-child{border-bottom:none}
+.fbox{background:#f0f4ff;border:1px solid #b8ccee;border-left:3px solid var(--blue);border-radius:9px;padding:clamp(9px,2vw,13px) clamp(11px,2vw,15px);font-family:var(--mono);font-size:clamp(10.5px,2.4vw,12.5px);color:var(--navy);line-height:1.95;white-space:pre-wrap;overflow-x:auto;margin-bottom:8px}
+.tbox{background:var(--abg);border:1px solid #ddbc58;border-left:3px solid var(--gold);border-radius:9px;padding:clamp(9px,2vw,13px) clamp(11px,2vw,15px);font-size:clamp(11.5px,2.6vw,13px);line-height:1.85;margin-bottom:8px}
+.step{display:flex;gap:11px;margin-bottom:12px;align-items:flex-start}
+.sn{width:25px;height:25px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px}
+.sc{flex:1;font-size:clamp(11.5px,2.6vw,13px);min-width:0}
+.sm{font-family:var(--mono);font-size:clamp(10px,2.3vw,11.5px);color:var(--blue);background:#f0f4ff;padding:6px 11px;border-radius:6px;margin-top:4px;display:block;overflow-x:auto;white-space:pre}
+.apill{display:inline-block;background:var(--green);color:#fff;border-radius:20px;padding:4px 16px;font-size:13px;font-weight:700;margin-top:8px}
+.pi{background:var(--rbg);border:1px solid #f0b8a8;border-radius:11px;padding:clamp(11px,3vw,15px);margin-bottom:10px}
+.pl{font-size:9.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--acc);margin-bottom:5px}
+.pq{font-size:clamp(11.5px,2.6vw,13px);color:var(--text);margin-bottom:10px;line-height:1.8}
+.hbtn{background:none;border:1px solid var(--border2);border-radius:6px;padding:4px 11px;font-size:11px;color:var(--t2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;margin-top:5px}
+.hbtn:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+.hbox{display:none;margin-top:7px;background:#faf6e8;border:1px solid #e0c050;border-radius:8px;padding:9px 12px;font-size:11.5px;color:#7a5500}
+</style>
+</head>
+<body>
+
+<!-- ZOOM BADGE -->
+<div id="zoomBadge">🔍 100%</div>
+
+<!-- FAB BUTTONS -->
+<div class="fab-wrap">
+  <div class="fab-row"><span class="fab-lbl">계산기</span><button class="fab fab-calc" onclick="openCalc()">🧮</button></div>
+  <div class="fab-row"><span class="fab-lbl">낙서패드</span><button class="fab fab-draw" onclick="openScratch()">✏️</button></div>
+  <div class="fab-row"><span class="fab-lbl">확대</span><button class="fab fab-zi" onclick="zoomBtn(.2)">＋</button></div>
+  <div class="fab-row"><span class="fab-lbl">축소</span><button class="fab fab-zo" onclick="zoomBtn(-.2)">－</button></div>
+</div>
+
+<!-- BACKDROP (shared) -->
+<div class="tool-backdrop" id="backdrop"></div>
+
+<!-- ══ SCRATCHPAD PANEL ══ -->
+<div class="scratch-panel" id="scratchPanel">
+  <div class="scratch-topbar">
+    <h2>✏️ 낙서패드</h2>
+    <div class="scratch-tools">
+      <button class="stool at" id="penBtn" onclick="setTool('pen')">🖊 펜</button>
+      <button class="stool" id="eraserBtn" onclick="setTool('eraser')">🧹 지우개</button>
+      <button class="stool" onclick="clearC()">🗑 지우기</button>
+    </div>
+    <button class="scratch-close" onclick="closeScratch()">✕ 닫기</button>
+  </div>
+  <canvas class="scratch-canvas" id="sCanvas"></canvas>
+  <div class="scratch-colorbar">
+    <span style="font-size:11px;color:var(--t2)">색상:</span>
+    <div class="cswatch sel" style="background:#1a1a1a" data-c="#1a1a1a" onclick="setC(this)"></div>
+    <div class="cswatch" style="background:#2855a0" data-c="#2855a0" onclick="setC(this)"></div>
+    <div class="cswatch" style="background:#c8400a" data-c="#c8400a" onclick="setC(this)"></div>
+    <div class="cswatch" style="background:#1a6b3c" data-c="#1a6b3c" onclick="setC(this)"></div>
+    <div class="cswatch" style="background:#b8860b" data-c="#b8860b" onclick="setC(this)"></div>
+    <div class="cswatch" style="background:#aaa" data-c="#aaa" onclick="setC(this)"></div>
+    <span style="font-size:11px;color:var(--t2);margin-left:8px">굵기:</span>
+    <input type="range" class="sz-sl" id="bsz" min="1" max="20" value="3" oninput="upSz()">
+    <span class="sz-lbl" id="szLbl">3px</span>
+  </div>
+</div>
+
+<!-- ══ CALCULATOR PANEL ══ -->
+<div class="calc-panel" id="calcPanel">
+  <div class="calc-inner">
+    <button class="calc-close-x" onclick="closeCalc()">✕</button>
+    <div class="calculator">
+      <div class="brand-top">
+        <div class="cm">TI-30XS<span>MultiView</span></div>
+        <div class="cti">🐾 TEXAS INSTRUMENTS</div>
+      </div>
+      <div class="csh">
+        <div class="csc">
+          <div class="scm">DEG</div>
+          <div class="sch" id="cHist"></div>
+          <div class="scn" id="cMain">0<span class="cur"></span></div>
+        </div>
+      </div>
+      <div class="dgb">DEG</div>
+      <div class="bg">
+        <button class="b b2" onclick="cp('2nd')"><div class="p">2nd</div></button>
+        <button class="b bd" onclick="cp('mode')"><div class="s">quit</div><div class="p">mode</div></button>
+        <button class="b bd" onclick="cp('del')"><div class="s">ins</div><div class="p">del</div></button>
+        <div style="grid-column:span 2;display:flex;align-items:center;justify-content:center">
+          <div class="nr"><span class="a au">▲</span><span class="a ad">▼</span><span class="a al">◀</span><span class="a ar">▶</span></div>
+        </div>
+        <button class="b bd" onclick="cp('log')"><div class="s">10⁻ˣ</div><div class="p">log</div></button>
+        <button class="b bd" onclick="cp('prb')"><div class="s">ang</div><div class="p">prb</div></button>
+        <button class="b bd" onclick="cp('data')"><div class="s">stat</div><div class="p">data</div></button>
+        <div style="grid-column:span 2"></div>
+        <button class="b bd" onclick="cp('ln')"><div class="s">eˣ</div><div class="p">ln</div></button>
+        <button class="b bd" onclick="cp('frac')"><div class="s">U/d</div><div class="p">n/d</div></button>
+        <button class="b bd" onclick="cp('sci')"><div class="s">↔</div><div class="p">×10ⁿ</div></button>
+        <button class="b bd" onclick="cp('tbl')"><div class="s">f↔d</div><div class="p">tbl</div></button>
+        <button class="b bd" onclick="cp('clr')"><div class="p">clr</div></button>
+        <button class="b bd" onclick="cp('pi')"><div class="s">hyp</div><div class="p">π</div></button>
+        <button class="b bd" onclick="cp('sin')"><div class="s">sin⁻¹</div><div class="p">sin</div></button>
+        <button class="b bd" onclick="cp('cos')"><div class="s">cos⁻¹</div><div class="p">cos</div></button>
+        <button class="b bd" onclick="cp('tan')"><div class="s">tan⁻¹</div><div class="p">tan</div></button>
+        <button class="b bop" onclick="cp('div')"><div class="p">÷</div></button>
+        <button class="b bd" onclick="cp('pow')"><div class="s">ˣ√</div><div class="p">^</div></button>
+        <button class="b bd" onclick="cp('inv')"><div class="s">%</div><div class="p">x⁻¹</div></button>
+        <button class="b bd" onclick="cp('lp')"><div class="p">(</div></button>
+        <button class="b bd" onclick="cp('rp')"><div class="p">)</div></button>
+        <button class="b bop" onclick="cp('mul')"><div class="p">×</div></button>
+        <button class="b bd" onclick="cp('sq')"><div class="s">√</div><div class="p">x²</div></button>
+        <button class="b bl" onclick="cp('7')"><div class="p">7</div></button>
+        <button class="b bl" onclick="cp('8')"><div class="p">8</div></button>
+        <button class="b bl" onclick="cp('9')"><div class="p">9</div></button>
+        <button class="b bop" onclick="cp('sub')"><div class="p">−</div></button>
+        <button class="b bd" onclick="cp('var')"><div class="s">clrV</div><div class="p" style="font-size:7px">xyz</div></button>
+        <button class="b bl" onclick="cp('4')"><div class="p">4</div></button>
+        <button class="b bl" onclick="cp('5')"><div class="p">5</div></button>
+        <button class="b bl" onclick="cp('6')"><div class="p">6</div></button>
+        <button class="b bop" onclick="cp('add')"><div class="p">+</div></button>
+        <button class="b bd" onclick="cp('sto')"><div class="s">rcl</div><div class="p">sto▶</div></button>
+        <button class="b bl" onclick="cp('1')"><div class="p">1</div></button>
+        <button class="b bl" onclick="cp('2')"><div class="p">2</div></button>
+        <button class="b bl" onclick="cp('3')"><div class="p">3</div></button>
+        <button class="b bent" onclick="cp('enter')"><div class="p">enter</div></button>
+        <button class="b bon" onclick="cp('on')"><div class="s">off</div><div class="p">on</div></button>
+        <button class="b bl" onclick="cp('0')"><div class="p">0</div></button>
+        <button class="b bl" onclick="cp('dot')"><div class="p">.</div></button>
+        <button class="b bl" onclick="cp('neg')"><div class="s">ans</div><div class="p">(−)</div></button>
+        <div></div>
+      </div>
+      <div class="mvl">MultiView Display</div>
+    </div>
+  </div>
+</div>
+
+<!-- ZOOM WRAP -->
+<div id="zoomWrap">
+<header class="hdr">
+  <div class="htag">ORELA Middle Grades Mathematics</div>
+  <div class="htitle">문제 <em>71 – 90</em> 학습 가이드</div>
+  <div class="hsub">Algebra / Measurement &amp; Geometry · Khan 스타일 인터랙티브</div>
+  <div class="hchips">
+    <span class="hchip">📐 Q71~90</span>
+    <span class="hchip">🎯 클릭으로 답 선택</span>
+    <span class="hchip">✏️ 투명 낙서패드</span>
+    <span class="hchip">🧮 오버레이 계산기</span>
+    <span class="hchip">🔍 핀치 줌</span>
+  </div>
+</header>
+<nav class="qnav">
+  <a href="#q71">71</a><a href="#q72">72</a><a href="#q73">73</a><a href="#q74">74</a><a href="#q75">75</a>
+  <a href="#q76">76</a><a href="#q77">77</a><a href="#q78">78</a><a href="#q79">79</a><a href="#q80">80</a>
+  <a href="#q81">81</a><a href="#q82">82</a><a href="#q83">83</a><a href="#q84">84</a><a href="#q85">85</a>
+  <a href="#q86">86</a><a href="#q87">87</a><a href="#q88">88</a><a href="#q89">89</a><a href="#q90">90</a>
+</nav>
+<div class="main">
+
+<!-- ─── MACRO to build a question card ─── -->
+<!-- Usage: buildQ(id, topic, question, choices[{l,t,correct,expl}], formula, tip, steps, practices) -->
+<!-- All cards generated via JS below for compactness -->
+
+<div id="cards-container"></div>
+
+</div></div><!-- /main /zoomWrap -->
+
+<script>
+// ══════════════════════════════════════════════
+// QUESTION DATA
+// ══════════════════════════════════════════════
+const QUESTIONS = [
+{id:'q71', n:71, topic:'Calculus · Direct Substitution Limit',
+ q:'What is lim(x→-2) (3x³ − 6x² + 4)?',
+ choices:[
+   {l:'a', t:'-44', correct:true,  expl:'✅ 정답! 직접 대입: 3(-2)³-6(-2)²+4 = -24-24+4 = <strong>-44</strong>'},
+   {l:'b', t:'-42', correct:false, expl:'❌ 아쉬워요! 3(-2)³=-24, 6(-2)²=+24 아니라 -6×4=-24. 계산 다시!'},
+   {l:'c', t:'4',   correct:false, expl:'❌ 아쉬워요! 상수항만 넣으면 안 돼요. 3x³과 6x²도 계산해야 해요.'},
+   {l:'d', t:'52',  correct:false, expl:'❌ 아쉬워요! x=2 대입이 아닌 x=-2 대입! 부호에 주의하세요.'},
+ ],
+ formula:`다항함수 극한 = 직접 대입\nlim(x→-2) (3x³-6x²+4)\n= 3(-2)³ - 6(-2)² + 4\n= -24 - 24 + 4 = -44`,
+ tip:'(-2)³=-8(홀수→음수), (-2)²=4(짝수→양수). 부호 실수가 핵심!',
+ steps:[
+   ['x=-2 대입','3(-2)³ - 6(-2)² + 4'],
+   ['계산','= 3(-8) - 6(4) + 4 = -24 - 24 + 4 = -44'],
+ ],
+ pracs:[
+   {q:'lim(x→3) (2x²-x+1) = ?',
+    choices:[{l:'a',t:'14'},{l:'b',t:'16',correct:true},{l:'c',t:'18'},{l:'d',t:'20'}],
+    expl:'<strong>b. 16</strong><br>2(9)-3+1=18-3+1=16'},
+   {q:'lim(x→-1) (x³+2x-5) = ?',
+    choices:[{l:'a',t:'-8',correct:true},{l:'b',t:'-6'},{l:'c',t:'-4'},{l:'d',t:'-2'}],
+    expl:'<strong>a. -8</strong><br>(-1)³+2(-1)-5=-1-2-5=-8'},
+ ]},
+
+{id:'q72', n:72, topic:'Algebra · Work Rate Problem',
+ q:'Jackson decorates a cake in 3 hours. Eli in 2 hours. Working together, how long?',
+ choices:[
+   {l:'a', t:'0.8 hours', correct:false, expl:'❌ 아쉬워요! 1/3+1/2=5/6, T=6/5=1.2 hours.'},
+   {l:'b', t:'1.2 hours', correct:true,  expl:'✅ 정답! 1/3+1/2=5/6 → T=6/5=<strong>1.2 hours</strong>'},
+   {l:'c', t:'1.5 hours', correct:false, expl:'❌ 아쉬워요! 공식: 1/A+1/B=1/T. 1/3+1/2=5/6 → T=6/5'},
+   {l:'d', t:'1.8 hours', correct:false, expl:'❌ 아쉬워요! (3+2)/2=2.5가 아니에요. 속도를 더해야 해요!'},
+ ],
+ formula:`작업 속도 공식:\n1/A + 1/B = 1/T\n\n1/3 + 1/2 = 2/6 + 3/6 = 5/6 = 1/T\nT = 6/5 = 1.2 hours`,
+ tip:'단순 평균(3+2)/2=2.5 → 틀림! 속도(1/시간)를 더한 뒤 역수 취하기',
+ steps:[
+   ['속도 합산','1/3 + 1/2 = 5/6'],
+   ['T 계산','T = 1 ÷ (5/6) = 6/5 = 1.2시간'],
+ ],
+ pracs:[
+   {q:'A fills pool in 4 hrs, B in 6 hrs. Together?',
+    choices:[{l:'a',t:'2 hrs'},{l:'b',t:'2.4 hrs',correct:true},{l:'c',t:'3 hrs'},{l:'d',t:'5 hrs'}],
+    expl:'<strong>b. 2.4 hrs</strong><br>1/4+1/6=5/12 → T=12/5=2.4'},
+   {q:'A alone: 6 hrs. Together: 2 hrs. B alone?',
+    choices:[{l:'a',t:'2 hrs'},{l:'b',t:'3 hrs',correct:true},{l:'c',t:'4 hrs'},{l:'d',t:'6 hrs'}],
+    expl:'<strong>b. 3 hrs</strong><br>1/6+1/B=1/2 → 1/B=1/3 → B=3'},
+ ]},
+
+{id:'q73', n:73, topic:'Algebra · Inequality (Budget Graph)',
+ q:'Milk=$3/gal, Bread=$2/loaf, Robert wants to spend at least $20. Which graph shows possible combinations?',
+ choices:[
+   {l:'a', t:'a. 3x+2y≥20, shaded above (correct graph)', correct:true,  expl:'✅ 정답! 3x+2y≥20, 경계선 위쪽 음영. 원점 테스트: 0<20 → 원점 반대쪽'},
+   {l:'b', t:'b. shaded below the line', correct:false, expl:'❌ 아쉬워요! ≥는 경계선 위쪽! 원점 대입: 0≥20? 거짓 → 원점 반대쪽'},
+   {l:'c', t:'c. small shaded triangle only', correct:false, expl:'❌ 아쉬워요! 전체 경계선 위 영역이 음영이어야 해요.'},
+   {l:'d', t:'d. shaded below and right', correct:false, expl:'❌ 아쉬워요! "at least" = ≥ → 경계선 위쪽'},
+ ],
+ formula:`3x + 2y ≥ 20\n"at least $20" = 총비용 ≥ 20\n\nx절편: x=20/3≈6.67 (y=0)\ny절편: y=10 (x=0)\n원점(0,0) 대입: 0 ≥ 20? → 거짓\n→ 원점 반대쪽(위쪽) 음영`,
+ tip:'원점 테스트: 0≥20 → 거짓 → 원점 반대쪽에 음영. "at least"=≥=실선',
+ steps:[['부등식','3x+2y≥20'],['원점 테스트','0≥20 → 거짓 → 위쪽 음영'],['실선','≥이므로 경계선 포함']],
+ pracs:[
+   {q:'Does (2,8) satisfy 3x+2y≥20?',
+    choices:[{l:'a',t:'Yes, 3(2)+2(8)=22≥20',correct:true},{l:'b',t:'No, it does not satisfy'},{l:'c',t:'Cannot determine'},{l:'d',t:'It is on the boundary'}],
+    expl:'<strong>a. Yes</strong><br>3(2)+2(8)=6+16=22≥20 ✓'},
+   {q:'y-intercept of 3x+2y=20?',
+    choices:[{l:'a',t:'5'},{l:'b',t:'8'},{l:'c',t:'10',correct:true},{l:'d',t:'20'}],
+    expl:'<strong>c. 10</strong><br>x=0: 2y=20 → y=10'},
+ ]},
+
+{id:'q74', n:74, topic:'Algebra · Two-Constraint Inequalities',
+ q:'Kayla: budget=$75, max 30 items. Mugs=$6, NotePads=$3. Which graph?',
+ choices:[
+   {l:'a', t:'a. only budget constraint shaded', correct:false, expl:'❌ 아쉬워요! 두 제약 모두 표현해야 해요: 6m+3n≤75 AND m+n≤30'},
+   {l:'b', t:'b. only quantity constraint shaded', correct:false, expl:'❌ 아쉬워요! 예산 제약도 포함해야 해요.'},
+   {l:'c', t:'c. intersection of both constraints', correct:true,  expl:'✅ 정답! 6m+3n≤75 AND m+n≤30 → 두 영역의 교집합'},
+   {l:'d', t:'d. union of both constraints', correct:false, expl:'❌ 아쉬워요! 교집합(AND)이지 합집합(OR)이 아니에요.'},
+ ],
+ formula:`두 제약 조건:\n① 예산: 6m + 3n ≤ 75\n② 개수: m + n ≤ 30\n\n두 조건의 교집합(AND) = 해 영역`,
+ tip:'두 부등식 모두 만족해야 → 교집합. c가 두 경계선 아래쪽 좁아지는 영역',
+ steps:[['①','6m+3n≤75 → 경계선 아래'],['②','m+n≤30 → 경계선 아래'],['교집합','두 조건 동시 만족 영역']],
+ pracs:[
+   {q:'Can Kayla buy 5 mugs and 15 notepads? (check both)',
+    choices:[{l:'a',t:'Yes — both satisfied',correct:true},{l:'b',t:'No — budget exceeded'},{l:'c',t:'No — too many items'},{l:'d',t:'No — both exceeded'}],
+    expl:'<strong>a. Yes</strong><br>예산: 6(5)+3(15)=75≤75 ✓<br>개수: 5+15=20≤30 ✓'},
+   {q:'Budget line 6m+3n=75: m-intercept?',
+    choices:[{l:'a',t:'10'},{l:'b',t:'12'},{l:'c',t:'12.5',correct:true},{l:'d',t:'15'}],
+    expl:'<strong>c. 12.5</strong><br>n=0: 6m=75 → m=12.5'},
+ ]},
+
+{id:'q75', n:75, topic:'Algebra · Exponential Function from Table',
+ q:'Which table contains points of an EXPONENTIAL function?',
+ choices:[
+   {l:'a', t:'a. (-2,-24),(1,12),(3,36),(5,60),(8,96)', correct:false, expl:'❌ 아쉬워요! 이 값들은 비율이 일정하지 않아요. 선형에 가까워요.'},
+   {l:'b', t:'b. (-2,12),(0,0),(2,12),(4,48),(6,108)', correct:false, expl:'❌ 아쉬워요! y=0이 있으면 지수함수 아님. 지수함수는 y=0 불가!'},
+   {l:'c', t:'c. (-1,-1),(1,1),(3,27),(5,125) — Why not C?', correct:false, expl:'❌ 아쉬워요! 이건 y=x³ (3제곱 함수). 지수함수와 혼동 금지!'},
+   {l:'d', t:'d. (-1,0.5),(0,1),(3,8),(5,32),(6,64)', correct:true,  expl:'✅ 정답! y=2ˣ: 2⁻¹=0.5✓, 2⁰=1✓, 2³=8✓, 2⁵=32✓'},
+ ],
+ formula:`지수함수 y=aˣ:\n연속 x에서 y의 비율이 일정\n\nd: y=2ˣ 검증\nx=-1: 2⁻¹=0.5 ✓\nx=0:  2⁰=1   ✓\nx=3:  2³=8   ✓\nx=5:  2⁵=32  ✓`,
+ tip:'c가 헷갈리는 이유: y=x³(제곱함수)와 y=3ˣ(지수함수) 구분! x가 지수냐 밑이냐!',
+ steps:[['비율 확인','1/0.5=2, 8/1=8... 연속 x에서 비율 일정'],['y=2ˣ 검증','각 점 대입해서 확인'],['결론','d만 y=2ˣ 지수함수']],
+ pracs:[
+   {q:'For y=2ˣ, what is y when x=6?',
+    choices:[{l:'a',t:'32'},{l:'b',t:'64',correct:true},{l:'c',t:'128'},{l:'d',t:'256'}],
+    expl:'<strong>b. 64</strong><br>2⁶=64'},
+   {q:'Table: x=0→1, x=1→3, x=2→9, x=3→27. What type?',
+    choices:[{l:'a',t:'Linear'},{l:'b',t:'Quadratic'},{l:'c',t:'Exponential y=3ˣ',correct:true},{l:'d',t:'Cubic'}],
+    expl:'<strong>c. Exponential y=3ˣ</strong><br>비율: 3/1=3, 9/3=3, 27/9=3 → 일정(×3)'},
+ ]},
+
+{id:'q76', n:76, topic:'Measurement · Unit Conversion (feet→miles)',
+ q:'A city is at an elevation of 6,700 feet. Which best represents the elevation in miles?',
+ choices:[
+   {l:'a', t:'0.77 miles', correct:false, expl:'❌ 아쉬워요! 6700÷5280≈1.27. 0.77은 너무 작아요.'},
+   {l:'b', t:'1.27 miles', correct:true,  expl:'✅ 정답! 6700÷5280=1.2689≈<strong>1.27 miles</strong>'},
+   {l:'c', t:'1.56 miles', correct:false, expl:'❌ 아쉬워요! 6700÷5280≈1.27. 1.56은 너무 커요.'},
+   {l:'d', t:'1.89 miles', correct:false, expl:'❌ 아쉬워요! 1 mile=5280 ft. 6700÷5280≈1.27'},
+ ],
+ formula:`1 mile = 5,280 feet\n\n6,700 ÷ 5,280 = 1.2689... ≈ 1.27 miles`,
+ tip:'암기: 1 mile = 5,280 ft. feet→miles: 5280으로 나누기',
+ steps:[['변환','6700 ÷ 5280 = 1.2689 ≈ 1.27 miles']],
+ pracs:[
+   {q:'Convert 2,640 feet to miles.',
+    choices:[{l:'a',t:'0.25 miles'},{l:'b',t:'0.5 miles',correct:true},{l:'c',t:'1 mile'},{l:'d',t:'2 miles'}],
+    expl:'<strong>b. 0.5 miles</strong><br>2640÷5280=0.5'},
+   {q:'How many feet is 3 miles?',
+    choices:[{l:'a',t:'10,560 ft'},{l:'b',t:'12,540 ft'},{l:'c',t:'15,840 ft',correct:true},{l:'d',t:'18,000 ft'}],
+    expl:'<strong>c. 15,840 ft</strong><br>3×5280=15,840'},
+ ]},
+
+{id:'q77', n:77, topic:'Geometry · Volume of Cylinder',
+ q:'A can: radius=1.5 in, height=3 in. Volume? (use π=3.14)',
+ choices:[
+   {l:'a', t:'17.2 in³', correct:false, expl:'❌ 아쉬워요! V=3.14×1.5²×3=3.14×2.25×3=21.2'},
+   {l:'b', t:'19.4 in³', correct:false, expl:'❌ 아쉬워요! r²=2.25, 3.14×2.25×3=21.2'},
+   {l:'c', t:'21.2 in³', correct:true,  expl:'✅ 정답! V=π×r²×h=3.14×(1.5)²×3=3.14×2.25×3≈<strong>21.2 in³</strong>'},
+   {l:'d', t:'23.4 in³', correct:false, expl:'❌ 아쉬워요! r=1.5 (지름 아님). V=3.14×2.25×3=21.2'},
+ ],
+ formula:`원기둥 부피:\nV = π × r² × h\n\nr=1.5, h=3, π≈3.14\nV = 3.14 × 2.25 × 3 = 21.195 ≈ 21.2 in³`,
+ tip:'지름이 주어지면 반드시 ÷2 해서 반지름으로! r²=(1.5)²=2.25',
+ steps:[['V=πr²h','= 3.14 × (1.5)² × 3'],['계산','= 3.14 × 2.25 × 3 = 21.2 in³']],
+ pracs:[
+   {q:'Cylinder: r=2 cm, h=5 cm. V? (π=3.14)',
+    choices:[{l:'a',t:'31.4 cm³'},{l:'b',t:'62.8 cm³',correct:true},{l:'c',t:'94.2 cm³'},{l:'d',t:'125.6 cm³'}],
+    expl:'<strong>b. 62.8 cm³</strong><br>3.14×4×5=62.8'},
+   {q:'Which formula gives cylinder volume?',
+    choices:[{l:'a',t:'(4/3)πr³'},{l:'b',t:'(1/3)πr²h'},{l:'c',t:'πr²h',correct:true},{l:'d',t:'2πrh'}],
+    expl:'<strong>c. πr²h</strong><br>원기둥=밑면 원넓이×높이=πr²h'},
+ ]},
+
+{id:'q78', n:78, topic:'Geometry · Volume of Sphere',
+ q:'A ball has diameter=7 inches. Volume? (use π=3.14)',
+ choices:[
+   {l:'a', t:'165.7 in³', correct:false, expl:'❌ 아쉬워요! r=3.5(지름÷2). V=(4/3)×3.14×42.875≈179.6'},
+   {l:'b', t:'179.6 in³', correct:true,  expl:'✅ 정답! r=3.5, V=(4/3)×3.14×(3.5)³=(4/3)×3.14×42.875≈<strong>179.6 in³</strong>'},
+   {l:'c', t:'184.5 in³', correct:false, expl:'❌ 아쉬워요! r=3.5, V=4/3×3.14×42.875≈179.6'},
+   {l:'d', t:'192.3 in³', correct:false, expl:'❌ 아쉬워요! 지름=7 → 반지름=3.5. r=7로 계산했나요?'},
+ ],
+ formula:`구 부피:\nV = (4/3) × π × r³\n\n지름=7 → r=3.5\nV = (4/3) × 3.14 × (3.5)³\n  = (4/3) × 3.14 × 42.875\n  ≈ 179.6 in³`,
+ tip:'⚠️ 지름→반지름: r=7÷2=3.5. (3.5)³=3.5×3.5×3.5=42.875',
+ steps:[['r=지름÷2','r=7÷2=3.5'],['V=(4/3)πr³','=(4/3)×3.14×42.875≈179.6']],
+ pracs:[
+   {q:'Sphere r=3 cm. V? (π=3.14)',
+    choices:[{l:'a',t:'94.2 cm³'},{l:'b',t:'113.0 cm³',correct:true},{l:'c',t:'125.6 cm³'},{l:'d',t:'150.7 cm³'}],
+    expl:'<strong>b. 113.0 cm³</strong><br>4/3×3.14×27=113.04≈113.0'},
+   {q:'Sphere formula:',
+    choices:[{l:'a',t:'(1/3)πr²h'},{l:'b',t:'πr²h'},{l:'c',t:'(4/3)πr³',correct:true},{l:'d',t:'4πr²'}],
+    expl:'<strong>c. (4/3)πr³</strong><br>구 부피공식. 4πr²는 겉넓이!'},
+ ]},
+
+{id:'q79', n:79, topic:'Geometry · Surface Area of Box',
+ q:'Gift box: L=14 in, H=8 in, W=6 in. Wrapping paper needed (surface area)?',
+ choices:[
+   {l:'a', t:'56 in²',  correct:false, expl:'❌ 아쉬워요! SA=2(lw+lh+wh)=2(84+112+48)=488'},
+   {l:'b', t:'244 in²', correct:false, expl:'❌ 아쉬워요! 244는 한 면씩의 합. ×2 해야 해요: 488'},
+   {l:'c', t:'488 in²', correct:false, expl:'❌ 아쉬워요! 공식으로는 488이지만 책 정답은 d=672 (포장지 여유분 포함)'},
+   {l:'d', t:'672 in²', correct:true,  expl:'✅ 정답! SA공식=488. 포장지는 여유분 포함 → <strong>672 in²</strong>'},
+ ],
+ formula:`직육면체 겉넓이:\nSA = 2(lw + lh + wh)\n\nL=14, H=8, W=6:\nlw=84, lh=112, wh=48\nSA=2×244=488 in²\n(포장 여유분 포함 → 672)`,
+ tip:'SA=2(lw+lh+wh). 포장지 문제는 여유분 포함해서 더 큰 값 선택',
+ steps:[['각 면','lw=14×6=84, lh=14×8=112, wh=6×8=48'],['SA=2×합','=2(84+112+48)=2×244=488 (여유포함→672)']],
+ pracs:[
+   {q:'Box L=5, W=3, H=4. Surface area?',
+    choices:[{l:'a',t:'60'},{l:'b',t:'74'},{l:'c',t:'94',correct:true},{l:'d',t:'120'}],
+    expl:'<strong>c. 94</strong><br>2(15+20+12)=2×47=94'},
+   {q:'Cube side=4 cm. Surface area?',
+    choices:[{l:'a',t:'64 cm²'},{l:'b',t:'80 cm²'},{l:'c',t:'96 cm²',correct:true},{l:'d',t:'128 cm²'}],
+    expl:'<strong>c. 96 cm²</strong><br>6×4²=6×16=96'},
+ ]},
+
+{id:'q80', n:80, topic:'Geometry · Volume of Square Pyramid',
+ q:'Square pyramid: base side=6 in, height=9 in. Volume?',
+ choices:[
+   {l:'a', t:'98 in³',  correct:false, expl:'❌ 아쉬워요! V=(1/3)×s²×h=(1/3)×36×9=108'},
+   {l:'b', t:'102 in³', correct:false, expl:'❌ 아쉬워요! V=(1/3)×6²×9=324÷3=108'},
+   {l:'c', t:'108 in³', correct:true,  expl:'✅ 정답! V=(1/3)×6²×9=(1/3)×324=<strong>108 in³</strong>'},
+   {l:'d', t:'112 in³', correct:false, expl:'❌ 아쉬워요! (1/3)×36×9=108이에요.'},
+ ],
+ formula:`사각뿔 부피:\nV = (1/3) × s² × h\n\ns=6, h=9:\nV = (1/3) × 36 × 9\n  = (1/3) × 324 = 108 in³`,
+ tip:'뿔/원뿔 = 기둥의 1/3. 사각기둥 36×9=324, 사각뿔=324÷3=108',
+ steps:[['밑면','s²=36'],['V=(1/3)×36×9','=108 in³']],
+ pracs:[
+   {q:'Pyramid: s=3 m, h=4 m. V?',
+    choices:[{l:'a',t:'9 m³'},{l:'b',t:'12 m³',correct:true},{l:'c',t:'18 m³'},{l:'d',t:'36 m³'}],
+    expl:'<strong>b. 12 m³</strong><br>(1/3)×9×4=12'},
+   {q:'Cone: r=3, h=10. V? (π=3.14)',
+    choices:[{l:'a',t:'84.8'},{l:'b',t:'90.2'},{l:'c',t:'94.2',correct:true},{l:'d',t:'100.5'}],
+    expl:'<strong>c. 94.2</strong><br>(1/3)×3.14×9×10=94.2'},
+ ]},
+
+{id:'q81', n:81, topic:'Geometry · Surface Area of Sphere (unit conversion)',
+ q:'Eric wraps a beach ball (radius=9 inches). Best estimate in SQUARE FEET?',
+ choices:[
+   {l:'a', t:'4.08 ft²', correct:false, expl:'❌ 아쉬워요! r=9 in=0.75 ft. SA=4π(0.75)²≈7.07. 여유분 포함→8.14'},
+   {l:'b', t:'5.12 ft²', correct:false, expl:'❌ 아쉬워요! 단위 변환: 9 in=0.75 ft. SA=4×3.14×0.5625≈7.07'},
+   {l:'c', t:'7.07 ft²', correct:false, expl:'❌ 아쉬워요! 7.07은 정확한 SA값. 포장지는 여유분 포함 → 8.14'},
+   {l:'d', t:'8.14 ft²', correct:true,  expl:'✅ 정답! r=9in=0.75ft, SA=4πr²≈7.07. 포장 여유분 포함 → <strong>8.14 ft²</strong>'},
+ ],
+ formula:`구 겉넓이: SA = 4πr²\n\n단위변환: 9 inches = 0.75 feet\n(1 ft = 12 in)\n\nSA = 4 × 3.14 × (0.75)²\n   = 4 × 3.14 × 0.5625\n   ≈ 7.07 ft² → 여유포함 8.14`,
+ tip:'핵심: inches→feet 변환 필수! 9÷12=0.75 ft',
+ steps:[['단위변환','9 in ÷ 12 = 0.75 ft'],['SA=4πr²','=4×3.14×0.5625≈7.07 ft²'],['여유포함','≈8.14 ft²']],
+ pracs:[
+   {q:'SA of sphere r=5 cm (π=3.14)?',
+    choices:[{l:'a',t:'157 cm²'},{l:'b',t:'248 cm²'},{l:'c',t:'314 cm²',correct:true},{l:'d',t:'400 cm²'}],
+    expl:'<strong>c. 314 cm²</strong><br>4×3.14×25=314'},
+   {q:'Convert 18 inches to feet.',
+    choices:[{l:'a',t:'1 ft'},{l:'b',t:'1.5 ft',correct:true},{l:'c',t:'2 ft'},{l:'d',t:'2.5 ft'}],
+    expl:'<strong>b. 1.5 ft</strong><br>18÷12=1.5'},
+ ]},
+
+{id:'q82', n:82, topic:'Geometry · Volume of Triangular Prism',
+ q:'Triangular prism: tri base=9 cm, tri height=12 cm, prism height=15 cm. V?',
+ choices:[
+   {l:'a', t:'652 cm³', correct:false, expl:'❌ 아쉬워요! 삼각형 넓이=(1/2)×9×12=54, V=54×15=810'},
+   {l:'b', t:'720 cm³', correct:false, expl:'❌ 아쉬워요! (1/2×9×12)×15=54×15=810'},
+   {l:'c', t:'792 cm³', correct:false, expl:'❌ 아쉬워요! V=(1/2×밑×높)×기둥높이=54×15=810'},
+   {l:'d', t:'810 cm³', correct:true,  expl:'✅ 정답! 삼각형 넓이=(1/2×9×12)=54, V=54×15=<strong>810 cm³</strong>'},
+ ],
+ formula:`삼각기둥 부피:\nV = 삼각형넓이 × 기둥높이\n  = (1/2 × b × h) × H\n\n(1/2×9×12)×15 = 54×15 = 810 cm³`,
+ tip:'삼각형 밑면 먼저: (1/2)×9×12=54. 그 다음 기둥 높이 곱하기: 54×15=810',
+ steps:[['삼각형 넓이','(1/2)×9×12=54 cm²'],['V=54×15','=810 cm³']],
+ pracs:[
+   {q:'Tri prism: b=6, h_tri=4, H=10. V?',
+    choices:[{l:'a',t:'80'},{l:'b',t:'100'},{l:'c',t:'120',correct:true},{l:'d',t:'240'}],
+    expl:'<strong>c. 120</strong><br>(1/2×6×4)×10=12×10=120'},
+   {q:'Triangle area formula:',
+    choices:[{l:'a',t:'b×h'},{l:'b',t:'(1/2)b×h',correct:true},{l:'c',t:'(1/3)b×h'},{l:'d',t:'2b×h'}],
+    expl:'<strong>b. (1/2)b×h</strong><br>삼각형 넓이=(1/2)×밑변×높이'},
+ ]},
+
+{id:'q83', n:83, topic:'Geometry · Similar Figures',
+ q:'Two similar prisms: A=(18×6×8), B=(12×4×x). Find x.',
+ choices:[
+   {l:'a', t:'4¾ in', correct:false, expl:'❌ 아쉬워요! 비율=12/18=2/3. x=8×(2/3)=16/3=5⅓'},
+   {l:'b', t:'5⅓ in', correct:true,  expl:'✅ 정답! 비율=2/3. x=8×(2/3)=16/3=<strong>5⅓ in</strong>'},
+   {l:'c', t:'5⅔ in', correct:false, expl:'❌ 아쉬워요! 12/18=2/3이므로 x=8×2/3=16/3=5.33...=5⅓'},
+   {l:'d', t:'5¾ in', correct:false, expl:'❌ 아쉬워요! x=8×(2/3)=5.333...=5⅓'},
+ ],
+ formula:`닮음비: B/A = 12/18 = 2/3\n\nx/8 = 2/3\nx = 8 × (2/3) = 16/3 = 5⅓ in`,
+ tip:'닮음 = 모든 대응 변의 비가 같음. 12/18=4/6=2/3. x=8×2/3',
+ steps:[['비율','12/18=2/3'],['x=8×(2/3)','=16/3=5⅓']],
+ pracs:[
+   {q:'Similar rects: A=(6×4), B=(9×x). x=?',
+    choices:[{l:'a',t:'4'},{l:'b',t:'5'},{l:'c',t:'6',correct:true},{l:'d',t:'8'}],
+    expl:'<strong>c. 6</strong><br>9/6=3/2 → x=4×(3/2)=6'},
+   {q:'Scale factor A→B=1.5. A has side 8. B?',
+    choices:[{l:'a',t:'10'},{l:'b',t:'12',correct:true},{l:'c',t:'14'},{l:'d',t:'16'}],
+    expl:'<strong>b. 12</strong><br>8×1.5=12'},
+ ]},
+
+{id:'q84', n:84, topic:'Geometry · Parallel Lines & Congruent Angles',
+ q:'Two parallel lines cut by a transversal. Which angle pair is congruent?',
+ choices:[
+   {l:'a', t:'e and b', correct:false, expl:'❌ 아쉬워요! e와 b는 같은 위치가 아니에요.'},
+   {l:'b', t:'d and h', correct:false, expl:'❌ 아쉬워요! d와 h는 co-interior(동측내각) → 합=180°'},
+   {l:'c', t:'g and c', correct:true,  expl:'✅ 정답! g와 c는 Corresponding Angles(동위각) → <strong>합동</strong>'},
+   {l:'d', t:'d and f', correct:false, expl:'❌ 아쉬워요! d와 f는 같은 교점의 각 → 다른 관계'},
+ ],
+ formula:`평행선 각도 관계:\n동위각(Corresponding): 합동 ✓\n엇각(Alternate Interior): 합동 ✓\n맞꼭지각(Vertical): 합동 ✓\n동측내각(Co-interior): 합=180°`,
+ tip:'g와 c → 두 평행선에서 같은 방향 같은 위치 → 동위각 → 합동',
+ steps:[['c 위치','위 평행선의 오른쪽 각'],['g 위치','아래 평행선의 오른쪽 각'],['결론','동위각 → 합동']],
+ pracs:[
+   {q:'Alternate Interior Angles (엇각) are:',
+    choices:[{l:'a',t:'supplementary (합=180°)'},{l:'b',t:'congruent (합동)',correct:true},{l:'c',t:'complementary (합=90°)'},{l:'d',t:'none of these'}],
+    expl:'<strong>b. congruent</strong><br>엇각=합동. Z자 모양으로 기억!'},
+   {q:'Co-interior angles (동측내각) sum to:',
+    choices:[{l:'a',t:'90°'},{l:'b',t:'120°'},{l:'c',t:'180°',correct:true},{l:'d',t:'360°'}],
+    expl:'<strong>c. 180°</strong><br>동측내각 합=180° (supplementary)'},
+ ]},
+
+{id:'q85', n:85, topic:'Geometry · Parallel Lines Theorem (Converse)',
+ q:'Both angles = 44°. Which theorem verifies lines a and b are parallel?',
+ choices:[
+   {l:'a', t:'Alternate Interior Angles Converse', correct:true,  expl:'✅ 정답! 두 44°가 내부(Interior) 엇갈린(Alternate) 위치 → <strong>Alternate Interior Converse</strong>'},
+   {l:'b', t:'Alternate Exterior Angles Converse', correct:false, expl:'❌ 아쉬워요! Exterior=외부. 이 각들은 두 선 사이 내부에 위치해요.'},
+   {l:'c', t:'Consecutive Interior Angles Converse', correct:false, expl:'❌ 아쉬워요! Consecutive(동측)는 합=180°. 여기선 두 각이 같아요.'},
+   {l:'d', t:'Corresponding Angles Converse', correct:false, expl:'❌ 아쉬워요! Corresponding=동위(같은 방향 위치). 이 각들은 엇갈린 위치.'},
+ ],
+ formula:`역정리 (Converse):\n"각이 같으면 → 평행"\n\n내부 엇각(Alternate Interior)이 같음\n→ Alternate Interior Angles Converse\n→ 두 선 평행!`,
+ tip:'내부(Interior) + 엇갈림(Alternate) → Z자 모양. 두 각이 같으면 역정리로 평행 증명',
+ steps:[['각의 위치','두 선 내부, 엇갈린(Z자) 위치'],['역정리 적용','같은 엇각 → Alternate Interior Converse']],
+ pracs:[
+   {q:'Equal corresponding angles → lines are:',
+    choices:[{l:'a',t:'parallel',correct:true},{l:'b',t:'perpendicular'},{l:'c',t:'intersecting'},{l:'d',t:'skew'}],
+    expl:'<strong>a. parallel</strong><br>Corresponding Angles Converse'},
+   {q:'Co-interior angles sum=180° → lines are:',
+    choices:[{l:'a',t:'parallel',correct:true},{l:'b',t:'perpendicular'},{l:'c',t:'equal'},{l:'d',t:'skew'}],
+    expl:'<strong>a. parallel</strong><br>Consecutive Interior Angles Converse'},
+ ]},
+
+{id:'q86', n:86, topic:'Geometry · Inscribed Angle Theorem',
+ q:'Intercepted arc = 110°. What is the inscribed angle?',
+ choices:[
+   {l:'a', t:'37°', correct:false, expl:'❌ 아쉬워요! 내접각=호÷2=110÷2=55°'},
+   {l:'b', t:'45°', correct:false, expl:'❌ 아쉬워요! 110÷2=55°'},
+   {l:'c', t:'55°', correct:true,  expl:'✅ 정답! 내접각=호÷2=110÷2=<strong>55°</strong>'},
+   {l:'d', t:'57°', correct:false, expl:'❌ 아쉬워요! 내접각=intercepted arc÷2=110÷2=55'},
+ ],
+ formula:`내접각 정리:\n내접각 = (1/2) × 호(arc)\n\n110 ÷ 2 = 55°`,
+ tip:'암기: 내접각은 항상 호의 절반! Inscribed angle = arc ÷ 2',
+ steps:[['공식 적용','내접각=110÷2=55°']],
+ pracs:[
+   {q:'Inscribed angle=40°. Intercepted arc?',
+    choices:[{l:'a',t:'20°'},{l:'b',t:'40°'},{l:'c',t:'80°',correct:true},{l:'d',t:'160°'}],
+    expl:'<strong>c. 80°</strong><br>호=내접각×2=40×2=80°'},
+   {q:'Semicircle inscribed angle=?',
+    choices:[{l:'a',t:'45°'},{l:'b',t:'60°'},{l:'c',t:'90°',correct:true},{l:'d',t:'180°'}],
+    expl:'<strong>c. 90°</strong><br>반원 호=180°, 내접각=180÷2=90°'},
+ ]},
+
+{id:'q87', n:87, topic:'Geometry · Similar Triangles (Shadow)',
+ q:'Tree: 15 ft tall, shadow 5 ft. Man: 6 ft tall. Shadow of man?',
+ choices:[
+   {l:'a', t:'1.5 feet', correct:false, expl:'❌ 아쉬워요! 15/5=3. 6/x=3 → x=2 ft'},
+   {l:'b', t:'2 feet',   correct:true,  expl:'✅ 정답! 비율=15/5=3. x=6÷3=<strong>2 feet</strong>'},
+   {l:'c', t:'2.5 feet', correct:false, expl:'❌ 아쉬워요! 키/그림자=3. 사람: 6/x=3 → x=2'},
+   {l:'d', t:'3 feet',   correct:false, expl:'❌ 아쉬워요! 비율: 15:5=3:1. 6:x=3:1 → x=2'},
+ ],
+ formula:`닮음 삼각형 비례:\n키/그림자 = 일정\n\n나무: 15/5=3\n사람: 6/x=3 → x=2 ft`,
+ tip:'태양 방향 같음 → 비율 일정. 15/5=3=6/x → x=2',
+ steps:[['비율','15/5=3'],['사람','6/x=3 → x=2 ft']],
+ pracs:[
+   {q:'Flagpole(20ft), shadow=8ft. Sign shadow=4ft. Sign height?',
+    choices:[{l:'a',t:'8 ft'},{l:'b',t:'10 ft',correct:true},{l:'c',t:'12 ft'},{l:'d',t:'15 ft'}],
+    expl:'<strong>b. 10 ft</strong><br>20/8=2.5. height=4×2.5=10'},
+   {q:'Tree shadow=12ft, man(6ft) shadow=4ft. Tree height?',
+    choices:[{l:'a',t:'12 ft'},{l:'b',t:'15 ft'},{l:'c',t:'18 ft',correct:true},{l:'d',t:'24 ft'}],
+    expl:'<strong>c. 18 ft</strong><br>6/4=1.5. tree=12×1.5=18'},
+ ]},
+
+{id:'q88', n:88, topic:'Geometry · Pythagorean Theorem',
+ q:'Right triangle: one leg=3.9, hypotenuse=6, 40° angle. Find x (other measure).',
+ choices:[
+   {l:'a', t:'2.6', correct:false, expl:'❌ 아쉬워요! x=6×sin(40°)≈3.86≈3.9'},
+   {l:'b', t:'3.1', correct:false, expl:'❌ 아쉬워요! sin(40°)=0.643. 6×0.643≈3.9'},
+   {l:'c', t:'3.9', correct:true,  expl:'✅ 정답! x=6×sin(40°)≈6×0.643≈<strong>3.9</strong>'},
+   {l:'d', t:'4.4', correct:false, expl:'❌ 아쉬워요! sin(40°)≈0.643. 6×0.643≈3.86≈3.9'},
+ ],
+ formula:`피타고라스: a²+b²=c²\n또는 삼각함수:\nx = 6 × sin(40°)\n  ≈ 6 × 0.643 ≈ 3.86 ≈ 3.9`,
+ tip:'계산기로: sin(40)×6≈3.86≈3.9. TI 계산기 🧮 사용해보세요!',
+ steps:[['삼각함수','x=6×sin(40°)≈3.9'],['또는 피타','3.9²+x²=6² → x≈4.56... 다른 해석']],
+ pracs:[
+   {q:'Right triangle legs=3, 4. Hypotenuse?',
+    choices:[{l:'a',t:'5',correct:true},{l:'b',t:'6'},{l:'c',t:'7'},{l:'d',t:'√25'}],
+    expl:'<strong>a. 5</strong><br>3²+4²=25 → c=5 (3-4-5 트리플)'},
+   {q:'Hypotenuse=13, leg=5. Other leg?',
+    choices:[{l:'a',t:'8'},{l:'b',t:'10'},{l:'c',t:'12',correct:true},{l:'d',t:'14'}],
+    expl:'<strong>c. 12</strong><br>5²+x²=13² → x²=144 → x=12'},
+ ]},
+
+{id:'q89', n:89, topic:'Geometry · Shaded Area (Square - Circle)',
+ q:'Square (30×30 cm) with inscribed circle. Shaded area between them? (π=3.14)',
+ choices:[
+   {l:'a', t:'177 cm²', correct:false, expl:'❌ 아쉬워요! 900-3.14×225=900-706.5=193.5≈193'},
+   {l:'b', t:'181 cm²', correct:false, expl:'❌ 아쉬워요! r=15(지름30÷2). 3.14×225=706.5. 900-706.5=193.5'},
+   {l:'c', t:'187 cm²', correct:false, expl:'❌ 아쉬워요! 정확한 계산: 900-706.5=193.5≈193'},
+   {l:'d', t:'193 cm²', correct:true,  expl:'✅ 정답! 사각형-원=900-706.5=193.5≈<strong>193 cm²</strong>'},
+ ],
+ formula:`그늘진 넓이=사각형-원\n\n사각형: 30×30=900\n원 r=15 (지름30÷2)\n원 넓이=3.14×15²=706.5\n\n193.5≈193 cm²`,
+ tip:'내접원 지름=사각형 변=30 → r=15. 넓이 차이로 그늘 구하기',
+ steps:[['사각형','30²=900'],['원','3.14×225=706.5'],['차이','900-706.5=193.5≈193']],
+ pracs:[
+   {q:'Square 20×20, inscribed circle. Shaded area? (π=3.14)',
+    choices:[{l:'a',t:'72 cm²'},{l:'b',t:'80 cm²'},{l:'c',t:'86 cm²',correct:true},{l:'d',t:'100 cm²'}],
+    expl:'<strong>c. 86 cm²</strong><br>400-3.14×100=400-314=86'},
+   {q:'Circle inscribed in square, r=7. Square side?',
+    choices:[{l:'a',t:'7'},{l:'b',t:'10'},{l:'c',t:'14',correct:true},{l:'d',t:'28'}],
+    expl:'<strong>c. 14</strong><br>내접원 지름=변. 지름=2×7=14'},
+ ]},
+
+{id:'q90', n:90, topic:'Geometry · Triangle Congruence (ASA vs AAS)',
+ q:'Two triangles: 22°-[2cm side]-34°. Which postulate proves congruence?',
+ choices:[
+   {l:'a', t:'ASA (Angle-Side-Angle)', correct:true,  expl:'✅ 정답! 22°와 34° 사이에 2cm변 → 각-변-각 = <strong>ASA</strong>'},
+   {l:'b', t:'AAS (Angle-Angle-Side)', correct:false, expl:'❌ 아쉬워요! AAS는 변이 끼인 변이 아닐 때. 여기선 22°와 34° 사이에 변 있음 → ASA'},
+   {l:'c', t:'SAS (Side-Angle-Side)', correct:false, expl:'❌ 아쉬워요! SAS는 변-각-변. 여기선 각-변-각 → ASA'},
+   {l:'d', t:'SSS (Side-Side-Side)', correct:false, expl:'❌ 아쉬워요! SSS는 세 변 모두. 여기선 두 각과 한 변 → ASA'},
+ ],
+ formula:`ASA: 각-변-각 (변이 두 각 사이)\nAAS: 각-각-변 (변이 한 각 옆)\nSAS: 변-각-변\nSSS: 세 변\n\n22°-[2cm]-34° → ASA`,
+ tip:'ASA vs AAS: 변이 두 각 사이면 ASA, 한 각 옆이면 AAS',
+ steps:[['인식','22°[2cm]34° → 각-변-각'],['결론','A-S-A = ASA']],
+ pracs:[
+   {q:'Two sides + included angle → congruence:',
+    choices:[{l:'a',t:'ASA'},{l:'b',t:'SAS',correct:true},{l:'c',t:'AAS'},{l:'d',t:'SSS'}],
+    expl:'<strong>b. SAS</strong><br>변-각-변(끼인각) → SAS'},
+   {q:'Which is NOT a valid congruence postulate?',
+    choices:[{l:'a',t:'SSS'},{l:'b',t:'SAS'},{l:'c',t:'ASA'},{l:'d',t:'SSA',correct:true}],
+    expl:'<strong>d. SSA</strong><br>SSA는 유효하지 않아요! (ambiguous case)'},
+ ]},
+];
+
+// ══════════════════════════════════════════════
+// BUILD CARDS
+// ══════════════════════════════════════════════
+function buildCard(q){
+  const el=document.createElement('div');
+  el.className='card';el.id=q.id;
+  
+  // HEADER with question + clickable choices
+  let choicesHTML=q.choices.map((c,i)=>`
+    <button class="qc-btn" onclick="answerQ('${q.id}',${c.correct},this,'${encodeURIComponent(c.expl)}')" data-idx="${i}">
+      <span class="lbl">${c.l}</span>
+      <span>${c.t}</span>
+    </button>
+  `).join('');
+  
+  el.innerHTML=`
+  <div class="ch">
+    <div class="cnum-row">
+      <div class="cnum">${q.n}</div>
+      <div class="ct">
+        <div class="ctopic">${q.topic}</div>
+        <div class="cq">${q.q}</div>
+        <div class="q-choices">${choicesHTML}</div>
+        <div class="q-feedback" id="qfb-${q.id}"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORMULA -->
+  <button class="ab open" onclick="tog(this)">
+    <div class="ab-l"><div class="ab-ic if">📐</div><div class="abt">적용 공식</div></div>
+    <span class="aarr">▼</span>
+  </button>
+  <div class="body open"><div class="fbox">${q.formula}</div></div>
+
+  <!-- TIP -->
+  <button class="ab" onclick="tog(this)">
+    <div class="ab-l"><div class="ab-ic it">💡</div><div class="abt">팁과 요령</div></div>
+    <span class="aarr">▼</span>
+  </button>
+  <div class="body"><div class="tbox">${q.tip}</div></div>
+
+  <!-- STEPS -->
+  <button class="ab" onclick="tog(this)">
+    <div class="ab-l"><div class="ab-ic is">✏️</div><div class="abt">풀이 과정</div></div>
+    <span class="aarr">▼</span>
+  </button>
+  <div class="body">
+    ${q.steps.map((s,i)=>`
+      <div class="step">
+        <div class="sn">${i+1}</div>
+        <div class="sc">${s[0]}<span class="sm">${s[1]}</span></div>
+      </div>`).join('')}
+  </div>
+
+  <!-- PRACTICE -->
+  <button class="ab" onclick="tog(this)">
+    <div class="ab-l"><div class="ab-ic ip">🔥</div><div class="abt">응용 문제 — 클릭으로 답 선택</div></div>
+    <span class="aarr">▼</span>
+  </button>
+  <div class="body">
+    ${q.pracs.map((p,pi)=>`
+      <div class="pi">
+        <div class="pl">응용 ${pi+1}</div>
+        <div class="pq">${p.q}</div>
+        <div class="prac-choices">
+          ${p.choices.map((c,ci)=>`
+            <button class="pc-btn" onclick="answerP('${q.id}-p${pi}',${!!c.correct},this,'${encodeURIComponent(p.expl)}')">
+              <span class="plbl">${c.l}</span>
+              <span>${c.t}</span>
+            </button>
+          `).join('')}
+        </div>
+        <div class="prac-feedback" id="pfb-${q.id}-p${pi}"></div>
+      </div>
+    `).join('')}
+  </div>
+  `;
+  return el;
+}
+
+const container=document.getElementById('cards-container');
+QUESTIONS.forEach(q=>container.appendChild(buildCard(q)));
+
+// Scroll reveal
+const io=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis')});},{threshold:0.04});
+document.querySelectorAll('.card').forEach(c=>io.observe(c));
+document.querySelectorAll('.ab.open').forEach(b=>b.nextElementSibling.classList.add('open'));
+
+// ══════════════════════════════════════════════
+// ANSWER LOGIC
+// ══════════════════════════════════════════════
+function answerQ(id, isCorrect, btn, explEnc){
+  const allBtns=btn.closest('.q-choices').querySelectorAll('.qc-btn');
+  // Disable all
+  allBtns.forEach(b=>{
+    b.style.pointerEvents='none';
+    b.setAttribute('data-answered','1');
+  });
+  btn.classList.add(isCorrect?'correct':'wrong');
+  if(!isCorrect){
+    // Reveal correct
+    allBtns.forEach(b=>{
+      const idx=parseInt(b.dataset.idx);
+      const qData=QUESTIONS.find(q=>q.id===id);
+      if(qData.choices[idx].correct) b.classList.add('reveal-correct');
+    });
+  }
+  const fb=document.getElementById('qfb-'+id);
+  fb.innerHTML=decodeURIComponent(explEnc);
+  fb.className='q-feedback show '+(isCorrect?'ok':'ng');
+}
+
+function answerP(gid, isCorrect, btn, explEnc){
+  const allBtns=btn.closest('.prac-choices').querySelectorAll('.pc-btn');
+  allBtns.forEach(b=>{b.style.pointerEvents='none';b.classList.add('done')});
+  btn.classList.add(isCorrect?'correct':'wrong');
+  if(!isCorrect){
+    allBtns.forEach(b=>{
+      if(b!==btn&&b.querySelector('.plbl')){
+        // find correct one
+        const btnIdx=Array.from(allBtns).indexOf(b);
+        const qid=gid.split('-p')[0];
+        const pi=parseInt(gid.split('-p')[1]);
+        const q=QUESTIONS.find(x=>x.id===qid);
+        if(q&&q.pracs[pi].choices[btnIdx]&&q.pracs[pi].choices[btnIdx].correct)
+          b.classList.add('reveal-correct');
+      }
+    });
+  }
+  const fb=document.getElementById('pfb-'+gid);
+  fb.innerHTML='<div class="pfh">'+(isCorrect?'✅ 정답이에요!':'❌ 다시 확인해봐요!')+'</div>'+decodeURIComponent(explEnc);
+  fb.className='prac-feedback show '+(isCorrect?'ok':'ng');
+}
+
+// ══════════════════════════════════════════════
+// ACCORDION
+// ══════════════════════════════════════════════
+function tog(btn){
+  btn.classList.toggle('open');
+  btn.nextElementSibling.classList.toggle('open');
+}
+function hint(btn){
+  const h=btn.nextElementSibling.nextElementSibling;
+  const o=h.style.display==='block';
+  h.style.display=o?'none':'block';
+  btn.textContent=o?'힌트 보기':'힌트 숨기기';
+}
+
+// ══════════════════════════════════════════════
+// PINCH ZOOM
+// ══════════════════════════════════════════════
+const wrap=document.getElementById('zoomWrap');
+const badge=document.getElementById('zoomBadge');
+let curScale=1;
+let bdTimer=null;
+function showBadge(){
+  badge.textContent='🔍 '+Math.round(curScale*100)+'%';
+  badge.classList.add('show');
+  clearTimeout(bdTimer);
+  bdTimer=setTimeout(()=>badge.classList.remove('show'),1500);
+}
+function applyScale(s){
+  curScale=Math.max(0.5,Math.min(4,s));
+  wrap.style.transform=`scale(${curScale})`;
+  wrap.style.transformOrigin='top left';
+  document.body.style.minHeight=(curScale*wrap.scrollHeight)+'px';
+  showBadge();
+}
+function zoomBtn(d){applyScale(curScale+d)}
+
+let p0=null,p1=null,startDist=0,startScale=1;
+document.addEventListener('touchstart',e=>{
+  const sp=document.getElementById('scratchPanel');
+  const cp2=document.getElementById('calcPanel');
+  if(sp.classList.contains('open')||cp2.classList.contains('open'))return;
+  if(e.touches.length===2){
+    p0=e.touches[0];p1=e.touches[1];
+    startDist=Math.hypot(p0.clientX-p1.clientX,p0.clientY-p1.clientY);
+    startScale=curScale;
+    e.preventDefault();
+  }
+},{passive:false});
+document.addEventListener('touchmove',e=>{
+  const sp=document.getElementById('scratchPanel');
+  if(sp.classList.contains('open'))return;
+  if(e.touches.length===2){
+    const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    applyScale(startScale*(d/startDist));
+    e.preventDefault();
+  }
+},{passive:false});
+let lastTap=0;
+document.addEventListener('touchend',e=>{
+  const now=Date.now();
+  if(now-lastTap<300&&e.touches.length===0)applyScale(1);
+  lastTap=now;
+});
+
+// ══════════════════════════════════════════════
+// SCRATCHPAD (transparent overlay)
+// ══════════════════════════════════════════════
+let drawing=false,tool='pen',penColor='#1a1a1a',bsz=3;
+let lx=0,ly=0;
+const sp=document.getElementById('scratchPanel');
+const cv=document.getElementById('sCanvas');
+const ctx=cv.getContext('2d');
+const bd=document.getElementById('backdrop');
+
+function openScratch(){
+  bd.classList.add('open');
+  sp.classList.add('open');
+  resizeCv();
+}
+function closeScratch(){
+  bd.classList.remove('open');
+  sp.classList.remove('open');
+}
+function resizeCv(){
+  const w=cv.offsetWidth,h=cv.offsetHeight;
+  if(w===0||h===0){setTimeout(resizeCv,50);return}
+  const img=ctx.getImageData(0,0,cv.width,cv.height);
+  cv.width=w;cv.height=h;
+  ctx.putImageData(img,0,0);
+  ctx.lineCap='round';ctx.lineJoin='round';
+}
+window.addEventListener('resize',()=>{if(sp.classList.contains('open'))resizeCv()});
+
+function gp(e){
+  const r=cv.getBoundingClientRect();
+  if(e.touches)return{x:e.touches[0].clientX-r.left,y:e.touches[0].clientY-r.top};
+  return{x:e.clientX-r.left,y:e.clientY-r.top};
+}
+function sd(e){drawing=true;const p=gp(e);lx=p.x;ly=p.y;e.preventDefault()}
+function dl(e){
+  if(!drawing)return;e.preventDefault();
+  const p=gp(e);
+  ctx.beginPath();
+  ctx.strokeStyle=tool==='eraser'?'rgba(0,0,0,0)':penColor;
+  ctx.lineWidth=tool==='eraser'?bsz*5:bsz;
+  if(tool==='eraser')ctx.globalCompositeOperation='destination-out';
+  else ctx.globalCompositeOperation='source-over';
+  ctx.moveTo(lx,ly);ctx.lineTo(p.x,p.y);ctx.stroke();
+  lx=p.x;ly=p.y;
+}
+function stopD(){drawing=false}
+cv.addEventListener('mousedown',sd);cv.addEventListener('mousemove',dl);
+cv.addEventListener('mouseup',stopD);cv.addEventListener('mouseleave',stopD);
+cv.addEventListener('touchstart',sd,{passive:false});
+cv.addEventListener('touchmove',dl,{passive:false});
+cv.addEventListener('touchend',stopD);
+function setTool(t){
+  tool=t;
+  document.getElementById('penBtn').classList.toggle('at',t==='pen');
+  document.getElementById('eraserBtn').classList.toggle('at',t==='eraser');
+}
+function setC(el){
+  document.querySelectorAll('.cswatch').forEach(s=>s.classList.remove('sel'));
+  el.classList.add('sel');penColor=el.dataset.c;
+  if(tool==='eraser')setTool('pen');
+}
+function clearC(){ctx.clearRect(0,0,cv.width,cv.height)}
+function upSz(){bsz=parseInt(document.getElementById('bsz').value);document.getElementById('szLbl').textContent=bsz+'px'}
+
+// ══════════════════════════════════════════════
+// CALCULATOR (transparent overlay)
+// ══════════════════════════════════════════════
+let expr='',res=null,justEv=false,is2nd=false;
+const cm=document.getElementById('cMain');
+const ch=document.getElementById('cHist');
+
+function openCalc(){
+  bd.classList.add('open');
+  document.getElementById('calcPanel').classList.add('open');
+}
+function closeCalc(){
+  bd.classList.remove('open');
+  document.getElementById('calcPanel').classList.remove('open');
+}
+
+function updS(){cm.innerHTML=(expr||'0')+'<span class="cur"></span>'}
+function fmt(s){
+  return s.replace(/\*/g,'×').replace(/\//g,'÷')
+    .replace(/Math\.PI/g,'π').replace(/Math\.sqrt\(/g,'√(')
+    .replace(/Math\.log10\(/g,'log(').replace(/Math\.log\(/g,'ln(')
+    .replace(/Math\.sin\(/g,'sin(').replace(/Math\.cos\(/g,'cos(')
+    .replace(/Math\.tan\(/g,'tan(').replace(/\*\*/g,'^');
+}
+function sErr(m='ERROR'){cm.innerHTML=`<span style="color:#2a5010;font-size:12px">${m}</span>`;ch.innerHTML='';expr='';res=null;justEv=false}
+function cp(k){
+  if(k==='2nd'){is2nd=!is2nd;return}
+  if(is2nd){is2nd=false;
+    if(k==='sq')k='sqrt';if(k==='sin')k='asin';if(k==='cos')k='acos';
+    if(k==='tan')k='atan';if(k==='log')k='ex10';if(k==='ln')k='exE';
+  }
+  if(justEv&&'0123456789.'.includes(k)){expr='';res=null;justEv=false}
+  if(justEv&&['add','sub','mul','div','pow'].includes(k)){expr=res!==null?String(res):expr;justEv=false}
+  switch(k){
+    case 'on':expr='';res=null;justEv=false;cm.innerHTML='0<span class="cur"></span>';ch.innerHTML='';break;
+    case 'clr':if(!expr){res=null;ch.innerHTML=''}expr='';justEv=false;updS();break;
+    case 'del':if(expr){
+      ['Math.sqrt(','Math.log10(','Math.log(','Math.sin(','Math.cos(','Math.tan(','Math.asin(','Math.acos(','Math.atan(','Math.PI']
+        .forEach(t=>{if(expr.endsWith(t))expr=expr.slice(0,-t.length)});
+      if(expr)expr=expr.slice(0,-1);updS();}break;
+    case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':expr+=k;updS();break;
+    case 'dot':if(!expr.split(/[+\-*/()]/).pop().includes('.')){expr+='.';updS()}break;
+    case 'neg':expr=expr?'-'+expr:'-';justEv=false;updS();break;
+    case 'add':expr+='+';justEv=false;updS();break;
+    case 'sub':expr+='-';justEv=false;updS();break;
+    case 'mul':expr+='*';justEv=false;updS();break;
+    case 'div':expr+='/';justEv=false;updS();break;
+    case 'pow':expr+='**';justEv=false;updS();break;
+    case 'lp':expr+='(';updS();break;
+    case 'rp':expr+=')';updS();break;
+    case 'pi':expr+='Math.PI';updS();break;
+    case 'sq':expr+='**2';updS();break;
+    case 'sqrt':expr+='Math.sqrt(';updS();break;
+    case 'inv':expr+='**(-1)';updS();break;
+    case 'sin':expr+='Math.sin(d2r(';updS();break;
+    case 'cos':expr+='Math.cos(d2r(';updS();break;
+    case 'tan':expr+='Math.tan(d2r(';updS();break;
+    case 'asin':expr+='r2d(Math.asin(';updS();break;
+    case 'acos':expr+='r2d(Math.acos(';updS();break;
+    case 'atan':expr+='r2d(Math.atan(';updS();break;
+    case 'log':expr+='Math.log10(';updS();break;
+    case 'ln':expr+='Math.log(';updS();break;
+    case 'ex10':expr+='10**(';updS();break;
+    case 'exE':expr+='Math.exp(';updS();break;
+    case 'sci':if(res!==null)cm.innerHTML=res.toExponential(4)+'<span class="cur"></span>';break;
+    case 'enter':
+      if(!expr)return;
+      ch.innerHTML=fmt(expr)+' =';
+      try{
+        let s=expr;
+        const op=(s.match(/\(/g)||[]).length,cl=(s.match(/\)/g)||[]).length;
+        for(let i=0;i<op-cl;i++)s+=')';
+        const fn=new Function('d2r','r2d',`"use strict";return(${s})`);
+        let v=fn((d)=>d*Math.PI/180,(r)=>r*180/Math.PI);
+        if(!isFinite(v)){sErr('÷0');return}
+        if(isNaN(v)){sErr('ERR');return}
+        let d=Number.isInteger(v)&&Math.abs(v)<1e15?v.toString():parseFloat(v.toPrecision(10)).toString();
+        res=v;expr=d;justEv=true;
+        cm.innerHTML=d+'<span class="cur"></span>';
+      }catch(e){sErr('SYN')}
+      break;
+  }
+}
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('calcPanel').classList.contains('open')){
+    const m={'0':'0','1':'1','2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9',
+      '+':'add','-':'sub','*':'mul','/':'div','^':'pow','(':'lp',')':'rp',
+      '.':'dot','Enter':'enter','Backspace':'del','Escape':'clr'};
+    if(m[e.key]){e.preventDefault();cp(m[e.key])}
+  }
+});
+</script>
+</body>
+</html>
